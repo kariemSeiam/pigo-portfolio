@@ -1,0 +1,139 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --theme-primary: 61 220 132;
+    --theme-secondary: 98 0 238;
+    --theme-accent: 3 218 197;
+    --theme-surface: 18 18 18;
+    --theme-text: 255 255 255;
+    --theme-text-secondary: 189 189 189;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    @apply bg-gray-950 text-white;
+    font-family: var(--font-body, 'Inter', sans-serif);
+    cursor: none;
+  }
+
+  body.cursor-default {
+    cursor: default;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    
+    * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply px-6 py-3 rounded-lg font-medium transition-all duration-300;
+    @apply focus:outline-none focus:ring-2 focus:ring-offset-2;
+    min-height: 48px;
+    min-width: 48px;
+  }
+
+  .btn-android {
+    @apply bg-android-primary text-gray-950 hover:shadow-elevation-4;
+    @apply relative overflow-hidden;
+  }
+
+  .btn-web {
+    @apply bg-gradient-to-r from-web-primary to-web-accent text-white;
+    @apply hover:shadow-glow-md hover:scale-105;
+  }
+
+  .card-android {
+    @apply bg-gray-900 rounded-2xl p-6 shadow-elevation-2;
+    @apply hover:shadow-elevation-8 transition-shadow duration-300;
+  }
+
+  .card-web {
+    @apply bg-gray-900/50 backdrop-blur-lg rounded-2xl p-6 border border-white/10;
+    @apply hover:shadow-glow-sm hover:scale-[1.02] transition-all duration-300;
+  }
+
+  .text-gradient-android {
+    @apply bg-gradient-to-r from-android-primary to-android-accent bg-clip-text text-transparent;
+  }
+
+  .text-gradient-web {
+    @apply bg-gradient-to-r from-web-primary via-web-secondary to-web-accent bg-clip-text text-transparent;
+  }
+
+  .container-responsive {
+    @apply w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .animation-delay-200 {
+    animation-delay: 200ms;
+  }
+
+  .animation-delay-400 {
+    animation-delay: 400ms;
+  }
+
+  .animation-delay-600 {
+    animation-delay: 600ms;
+  }
+}
+
+/* Custom cursor styles */
+.custom-cursor {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  mix-blend-mode: difference;
+}
+
+/* Ripple effect */
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.6);
+  width: 20px;
+  height: 20px;
+  animation: ripple 0.6s ease-out;
+  pointer-events: none;
+}
+
+/* Loading spinner */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+/* Focus visible for accessibility */
+:focus-visible {
+  @apply outline-2 outline-offset-2 outline-white/50;
+}
+
