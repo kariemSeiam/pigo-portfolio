@@ -4,12 +4,13 @@ import { motion } from 'framer-motion'
 import { getProjectBySlug } from '@/lib/data/projects'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, use } from 'react'
 import { useThemeStore } from '@/lib/store/theme'
 import { androidTheme, webTheme } from '@/lib/themes'
 
-export default function ProjectPage({ params }: { params: { slug: string } }) {
-  const project = getProjectBySlug(params.slug)
+export default function ProjectPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = use(params)
+  const project = getProjectBySlug(slug)
   const { setTheme } = useThemeStore()
   const [mounted, setMounted] = useState(false)
 
