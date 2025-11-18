@@ -4,11 +4,12 @@ export const androidTheme: Theme = {
   id: 'android',
   name: 'Android Development',
   colors: {
-    primary: '#3DDC84',
-    secondary: '#6200EE',
-    accent: '#03DAC5',
-    surface: '#121212',
-    error: '#CF6679',
+    primary: '#3DDC84',      // Material Design 3 primary green
+    secondary: '#6200EE',    // Deep purple
+    accent: '#03DAC5',       // Teal accent
+    surface: '#121212',      // Dark surface
+    onSurface: '#FFFFFF',    // White text on surface
+    error: '#CF6679',        // Error red
   },
   fonts: {
     heading: 'Google Sans, Roboto, sans-serif',
@@ -16,16 +17,16 @@ export const androidTheme: Theme = {
     code: 'JetBrains Mono, monospace',
   },
   animations: {
-    transition: 'spring(1, 80, 10, 0)',
-    duration: 0.4,
+    transition: 'spring(1, 80, 10, 0)',  // Material Design spring
+    duration: 400,
   },
   patterns: {
-    background: 'hexagon-grid',
-    cursorStyle: 'ripple',
+    background: 'hexagon',    // Hexagon tessellation pattern
+    cursorStyle: 'ripple',    // Material Design ripple effect
   },
   layout: {
-    navigation: 'bottom-bar',
-    cardStyle: 'elevation',
+    navigation: 'bottom-bar', // Material bottom navigation
+    cardStyle: 'elevation',   // Material elevation shadows
   },
 }
 

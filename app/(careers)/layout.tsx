@@ -19,6 +19,9 @@ export default function CareersLayout({
   const getBackgroundPattern = () => {
     if (pathname.startsWith('/android')) return 'hexagon'
     if (pathname.startsWith('/web')) return 'grid'
+    if (pathname.startsWith('/forex')) return 'candlesticks'
+    if (pathname.startsWith('/data')) return 'network'
+    if (pathname.startsWith('/design')) return 'bezier'
     return 'particles'
   }
 

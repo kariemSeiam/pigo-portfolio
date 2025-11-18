@@ -10,8 +10,9 @@ import AdaptiveCursor from '@/components/adaptive/AdaptiveCursor'
 const morphingTexts = [
   { prefix: 'I build', highlight: 'Android Apps', color: 'text-android-primary' },
   { prefix: 'I create', highlight: 'Web Experiences', color: 'text-web-primary' },
-  { prefix: 'I develop', highlight: 'SaaS Products', color: 'text-gradient-web' },
-  { prefix: 'I craft', highlight: 'Digital Solutions', color: 'text-android-accent' },
+  { prefix: 'I trade', highlight: 'Forex Markets', color: 'text-forex-primary' },
+  { prefix: 'I analyze', highlight: 'Data & ML', color: 'text-data-primary' },
+  { prefix: 'I design', highlight: 'UI/UX', color: 'text-design-primary' },
 ]
 
 export default function HomePage() {
@@ -69,38 +70,87 @@ export default function HomePage() {
               transition={{ delay: 0.4, duration: 0.8 }}
               className="text-body text-gray-400 max-w-2xl mx-auto mt-6"
             >
-              A multifaceted developer crafting experiences across Android, Web, and beyond.
-              Explore my journey through different domains of technology.
+              A multifaceted professional crafting experiences across 5 domains: Android, Web,
+              Forex Trading, Data Analysis, and UI/UX Design. Each refraction reveals a different expertise.
             </motion.p>
           </motion.div>
         </section>
 
-        {/* Domain Cards */}
-        <section className="w-full max-w-6xl mb-16">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+        {/* Domain Cards - The Prism */}
+        <section className="w-full max-w-7xl mb-16">
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.6 }}
+            className="text-3xl font-bold text-center mb-12 text-gradient-android"
+          >
+            Explore Through the Prism
+          </motion.h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.6, duration: 0.6 }}
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6, duration: 0.5 }}
             >
               <DomainCard
                 title="Android Development"
-                description="Native Android apps built with Kotlin, Jetpack Compose, and Material Design 3"
+                description="Native Android apps with Kotlin, Jetpack Compose, and Material Design 3"
                 domain="android"
                 icon="📱"
               />
             </motion.div>
 
             <motion.div
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.8, duration: 0.6 }}
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.7, duration: 0.5 }}
             >
               <DomainCard
                 title="Web Development"
-                description="Full-stack web applications with React, Next.js, and modern technologies"
+                description="Full-stack web applications with React, Next.js, and TypeScript"
                 domain="web"
                 icon="🌐"
+              />
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8, duration: 0.5 }}
+            >
+              <DomainCard
+                title="Forex Trading"
+                description="Systematic trading strategies with technical analysis and risk management"
+                domain="forex"
+                icon="💹"
+              />
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.9, duration: 0.5 }}
+            >
+              <DomainCard
+                title="Data Analysis"
+                description="Machine learning models and statistical analysis with Python and TensorFlow"
+                domain="data"
+                icon="📊"
+              />
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.0, duration: 0.5 }}
+              className="md:col-span-2 lg:col-span-1"
+            >
+              <DomainCard
+                title="UI/UX Design"
+                description="User-centered design with Figma, prototyping, and design systems"
+                domain="design"
+                icon="🎨"
               />
             </motion.div>
           </div>
@@ -110,24 +160,26 @@ export default function HomePage() {
         <motion.section
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1, duration: 0.6 }}
-          className="w-full max-w-4xl"
+          transition={{ delay: 1.1, duration: 0.6 }}
+          className="w-full max-w-5xl"
         >
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 sm:gap-6">
             {[
-              { label: 'Projects', value: '10+' },
-              { label: 'Technologies', value: '20+' },
-              { label: 'Experience', value: '3+ Years' },
-              { label: 'Coffee', value: '∞' },
+              { label: 'Domains', value: '5', gradient: 'text-gradient-android' },
+              { label: 'Projects', value: '50+', gradient: 'text-gradient-web' },
+              { label: 'Technologies', value: '30+', gradient: 'text-gradient-forex' },
+              { label: 'Experience', value: '5+ Years', gradient: 'text-gradient-data' },
+              { label: 'Coffee', value: '∞', gradient: 'text-gradient-design' },
             ].map((stat, index) => (
               <motion.div
                 key={stat.label}
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 1.2 + index * 0.1, duration: 0.4 }}
-                className="bg-gray-900/50 backdrop-blur-lg rounded-xl p-4 sm:p-6 border border-white/10 text-center hover:border-white/20 transition-colors"
+                transition={{ delay: 1.3 + index * 0.08, duration: 0.4 }}
+                whileHover={{ scale: 1.05, y: -5 }}
+                className="bg-gray-900/50 backdrop-blur-lg rounded-xl p-4 sm:p-6 border border-white/10 text-center hover:border-white/20 transition-all cursor-pointer"
               >
-                <div className="text-2xl sm:text-3xl font-bold text-gradient-android mb-2">
+                <div className={`text-2xl sm:text-3xl font-bold ${stat.gradient} mb-2`}>
                   {stat.value}
                 </div>
                 <div className="text-sm text-gray-400">{stat.label}</div>

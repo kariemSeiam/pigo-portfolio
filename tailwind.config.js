@@ -8,7 +8,7 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Android Theme
+        // Android Theme (Material Design 3)
         android: {
           primary: '#3DDC84',
           secondary: '#6200EE',
@@ -16,12 +16,33 @@ module.exports = {
           surface: '#121212',
           error: '#CF6679',
         },
-        // Web Theme
+        // Web Theme (Neo-Brutalist Glassmorphism)
         web: {
           primary: '#00D9FF',
-          secondary: '#9333EA',
-          accent: '#A855F7',
+          secondary: '#6200EE',
+          accent: '#A47764', // Mocha Mousse 2025
           surface: '#0A0A0A',
+        },
+        // Forex Theme (Financial Terminal)
+        forex: {
+          primary: '#FFD700',    // Gold (wealth)
+          bull: '#26A69A',       // Teal (buy signals)
+          bear: '#EF5350',       // Red (sell signals)
+          surface: '#0D0D0D',    // Terminal black
+        },
+        // Data Analysis Theme (Multi-color)
+        data: {
+          primary: '#FF6B6B',    // Warm red
+          secondary: '#4ECDC4',  // Teal
+          accent: '#45B7D1',     // Sky blue
+          surface: '#0F0F0F',    // Notebook dark
+        },
+        // Design Theme (Creative)
+        design: {
+          primary: '#FF1493',    // Deep Pink
+          secondary: '#9370DB',  // Medium Purple
+          accent: '#FFD700',     // Gold
+          surface: '#0A0A0A',    // Figma dark
         },
       },
       fontFamily: {

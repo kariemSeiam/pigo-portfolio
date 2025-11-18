@@ -3,10 +3,11 @@
 import { ReactNode, useEffect } from 'react'
 import { useThemeStore } from '@/lib/store/theme'
 import { motion, AnimatePresence } from 'framer-motion'
+import { Theme, hexToRgb } from '@/lib/themes'
 
 interface ThemeProviderProps {
   children: ReactNode
-  theme?: any
+  theme?: Theme
 }
 
 export default function ThemeProvider({ children, theme }: ThemeProviderProps) {
@@ -19,33 +20,29 @@ export default function ThemeProvider({ children, theme }: ThemeProviderProps) {
     }
   }, [theme, currentTheme.id, setTheme])
 
-  const applyThemeToDom = (activeTheme: any) => {
+  const applyThemeToDom = (activeTheme: Theme) => {
     const root = document.documentElement
 
-    // Apply color CSS variables
+    // Apply color CSS variables (RGB format for Tailwind)
     root.style.setProperty('--theme-primary', hexToRgb(activeTheme.colors.primary))
     root.style.setProperty('--theme-secondary', hexToRgb(activeTheme.colors.secondary))
     root.style.setProperty('--theme-accent', hexToRgb(activeTheme.colors.accent))
     root.style.setProperty('--theme-surface', hexToRgb(activeTheme.colors.surface))
+    root.style.setProperty('--theme-on-surface', hexToRgb(activeTheme.colors.onSurface))
 
     // Apply font variables
     root.style.setProperty('--font-heading', activeTheme.fonts.heading)
     root.style.setProperty('--font-body', activeTheme.fonts.body)
     root.style.setProperty('--font-code', activeTheme.fonts.code)
 
-    // Apply animation duration
-    root.style.setProperty('--transition-duration', `${activeTheme.animations.duration}s`)
+    // Apply animation duration (milliseconds)
+    root.style.setProperty('--transition-duration', `${activeTheme.animations.duration}ms`)
 
     // Data attributes for CSS selectors
     root.setAttribute('data-theme', activeTheme.id)
     root.setAttribute('data-cursor-style', activeTheme.patterns.cursorStyle)
-  }
-
-  const hexToRgb = (hex: string): string => {
-    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
-    return result
-      ? `${parseInt(result[1], 16)} ${parseInt(result[2], 16)} ${parseInt(result[3], 16)}`
-      : '0 0 0'
+    root.setAttribute('data-background-pattern', activeTheme.patterns.background)
+    root.setAttribute('data-navigation-style', activeTheme.layout.navigation)
   }
 
   return (
@@ -62,12 +59,5 @@ export default function ThemeProvider({ children, theme }: ThemeProviderProps) {
       </motion.div>
     </AnimatePresence>
   )
-}
-
-function hexToRgb(hex: string): string {
-  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
-  return result
-    ? `${parseInt(result[1], 16)} ${parseInt(result[2], 16)} ${parseInt(result[3], 16)}`
-    : '0 0 0'
 }
 
