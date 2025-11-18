@@ -4547,5 +4547,2695 @@ Each domain features:
 - ✅ Custom card components
 - ✅ One signature interactive feature
 
-**Next Steps**: Would you like me to add the remaining blueprint chapters (Signature Features, UX Psychology, MENA Optimization, 8-Week Roadmap)?
+---
+
+# Chapter 7: 🎯 Signature Features Deep-Dive
+
+This chapter covers the three game-changing features that make The Prism Portfolio truly revolutionary.
+
+---
+
+## 7.1 The Prism Refraction Transition System
+
+### Core Concept
+
+Instead of standard page transitions, the entire interface "refracts" like light through a prism when switching domains. This creates a memorable, physics-based transition that reinforces the portfolio's central metaphor.
+
+### Technical Implementation
+
+**View Transitions API** (Baseline October 2025):
+
+```typescript
+// lib/animations/prism-transition.ts
+export async function refractToDomain(targetDomain: Domain) {
+  if (!document.startViewTransition) {
+    // Fallback for older browsers
+    window.location.href = `/${targetDomain}`;
+    return;
+  }
+
+  const transition = document.startViewTransition(async () => {
+    // Update DOM to target domain
+    await navigateTo(targetDomain);
+  });
+
+  // Apply prism refraction effect
+  await transition.ready;
+
+  document.documentElement.style.setProperty(
+    '--prism-angle',
+    `${getDomainAngle(targetDomain)}deg`
+  );
+}
+
+function getDomainAngle(domain: Domain): number {
+  const angles = {
+    android: -30,    // Violet wavelength
+    web: -15,        // Blue wavelength
+    forex: 0,        // Green (center)
+    data: 15,        // Yellow wavelength
+    design: 30,      // Red wavelength
+  };
+  return angles[domain];
+}
+```
+
+**CSS for Prism Effect**:
+
+```css
+/* globals.css */
+@keyframes prism-refract {
+  0% {
+    transform: translateX(0) skewX(0deg);
+    filter: blur(0px) hue-rotate(0deg);
+  }
+  50% {
+    transform: translateX(-100vw) skewX(var(--prism-angle));
+    filter: blur(20px) hue-rotate(180deg);
+    opacity: 0.3;
+  }
+  100% {
+    transform: translateX(0) skewX(0deg);
+    filter: blur(0px) hue-rotate(var(--target-hue, 0deg));
+    opacity: 1;
+  }
+}
+
+::view-transition-old(root) {
+  animation: prism-refract 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+::view-transition-new(root) {
+  animation: prism-refract 0.8s cubic-bezier(0.4, 0, 0.2, 1) reverse;
+}
+
+/* Add chromatic aberration effect */
+::view-transition-group(root) {
+  filter:
+    drop-shadow(2px 0 0 rgba(255, 0, 0, 0.5))
+    drop-shadow(-2px 0 0 rgba(0, 255, 255, 0.5));
+}
+```
+
+**Advanced: Spectrum Dispersion Effect**
+
+```tsx
+// components/transitions/SpectrumDispersion.tsx
+'use client';
+
+import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
+
+interface SpectrumBand {
+  color: string;
+  delay: number;
+  wavelength: number;
+}
+
+export function SpectrumDispersion({ isTransitioning }: { isTransitioning: boolean }) {
+  const bands: SpectrumBand[] = [
+    { color: '#9400D3', delay: 0, wavelength: 380 },      // Violet
+    { color: '#4B0082', delay: 0.05, wavelength: 450 },   // Indigo
+    { color: '#0000FF', delay: 0.1, wavelength: 495 },    // Blue
+    { color: '#00FF00', delay: 0.15, wavelength: 570 },   // Green
+    { color: '#FFFF00', delay: 0.2, wavelength: 590 },    // Yellow
+    { color: '#FF7F00', delay: 0.25, wavelength: 620 },   // Orange
+    { color: '#FF0000', delay: 0.3, wavelength: 750 },    // Red
+  ];
+
+  if (!isTransitioning) return null;
+
+  return (
+    <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
+      {bands.map((band, index) => (
+        <motion.div
+          key={band.wavelength}
+          className="absolute inset-0"
+          style={{
+            background: `linear-gradient(90deg, transparent, ${band.color}, transparent)`,
+            mixBlendMode: 'screen',
+          }}
+          initial={{ x: '-100%', opacity: 0 }}
+          animate={{
+            x: ['- 100%', '0%', '100%'],
+            opacity: [0, 0.6, 0],
+          }}
+          transition={{
+            duration: 0.8,
+            delay: band.delay,
+            ease: [0.4, 0, 0.2, 1],
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+```
+
+**Physics-Based Timing**:
+
+```typescript
+// lib/animations/physics.ts
+export function calculateRefractionIndex(fromDomain: Domain, toDomain: Domain): number {
+  // Simulate Snell's Law: n1 * sin(θ1) = n2 * sin(θ2)
+  const refractiveIndices = {
+    android: 1.33,   // Water (fluid, organic)
+    web: 1.52,       // Glass (transparent, structural)
+    forex: 1.76,     // Sapphire (precise, valuable)
+    data: 1.46,      // Quartz (crystalline, analytical)
+    design: 1.92,    // Diamond (brilliant, multifaceted)
+  };
+
+  const n1 = refractiveIndices[fromDomain];
+  const n2 = refractiveIndices[toDomain];
+
+  // Calculate transition duration based on refractive index difference
+  const indexDelta = Math.abs(n1 - n2);
+  const baseDuration = 600; // ms
+
+  return baseDuration + (indexDelta * 200);
+}
+```
+
+### UX Enhancements
+
+**1. Transition Previews**:
+
+```tsx
+// On hover over domain cards, show mini prism preview
+<motion.div
+  onHoverStart={() => setShowPreview(true)}
+  onHoverEnd={() => setShowPreview(false)}
+>
+  <DomainCard domain="android" />
+  {showPreview && (
+    <motion.div
+      className="absolute inset-0 pointer-events-none"
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={{ opacity: 1, scale: 1 }}
+    >
+      <PrismPreview targetDomain="android" />
+    </motion.div>
+  )}
+</motion.div>
+```
+
+**2. Sound Design** (Optional):
+
+```typescript
+// lib/audio/transition-sounds.ts
+export function playRefractionSound(domain: Domain) {
+  const audioContext = new AudioContext();
+  const oscillator = audioContext.createOscillator();
+  const gainNode = audioContext.createGain();
+
+  // Map domain to frequency (musical notes)
+  const frequencies = {
+    android: 261.63,  // C4
+    web: 293.66,      // D4
+    forex: 329.63,    // E4
+    data: 349.23,     // F4
+    design: 392.00,   // G4
+  };
+
+  oscillator.frequency.value = frequencies[domain];
+  oscillator.type = 'sine';
+
+  // Fade in/out
+  gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+  gainNode.gain.linearRampToValueAtTime(0.1, audioContext.currentTime + 0.1);
+  gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.4);
+
+  oscillator.connect(gainNode);
+  gainNode.connect(audioContext.destination);
+
+  oscillator.start();
+  oscillator.stop(audioContext.currentTime + 0.5);
+}
+```
+
+---
+
+## 7.2 AI Chatbot with RAG (Retrieval Augmented Generation)
+
+### Core Concept
+
+An AI assistant that can answer questions about your career, projects, and skills by retrieving context from your portfolio data. Goes beyond basic chatbots by providing accurate, context-aware responses.
+
+### Architecture
+
+```
+User Question
+    ↓
+Embedding Generation (OpenAI)
+    ↓
+Vector Search (Pinecone/Supabase pgvector)
+    ↓
+Context Retrieval (Top 5 relevant chunks)
+    ↓
+LLM Completion (GPT-4/Claude with context)
+    ↓
+Streamed Response
+```
+
+### Data Preparation
+
+**1. Create Knowledge Base**:
+
+```typescript
+// scripts/generate-embeddings.ts
+import { createClient } from '@supabase/supabase-js';
+import { OpenAI } from 'openai';
+
+const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_KEY!);
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
+
+interface KnowledgeChunk {
+  id: string;
+  content: string;
+  metadata: {
+    type: 'project' | 'skill' | 'experience' | 'education';
+    domain?: Domain;
+    title?: string;
+  };
+}
+
+async function generateEmbeddings() {
+  const chunks: KnowledgeChunk[] = [
+    // Projects
+    ...projects.map(project => ({
+      id: `project-${project.id}`,
+      content: `${project.title}: ${project.longDescription}. Technologies: ${project.technologies.join(', ')}. ${project.impactMetrics?.map(m => `${m.label}: ${m.value}`).join('. ')}`,
+      metadata: {
+        type: 'project' as const,
+        domain: project.domain,
+        title: project.title,
+      }
+    })),
+
+    // Timeline entries
+    ...timelineData.map(entry => ({
+      id: `timeline-${entry.id}`,
+      content: `${entry.title} at ${entry.company} (${entry.start} - ${entry.end || 'Present'}): ${entry.description}. ${entry.achievements?.join('. ')}`,
+      metadata: {
+        type: 'experience' as const,
+        domain: entry.domain,
+        title: entry.title,
+      }
+    })),
+
+    // Skills
+    {
+      id: 'skills-android',
+      content: 'Android development expertise: Kotlin, Jetpack Compose, Material Design 3, MVVM architecture, Room database, Coroutines, Retrofit, Dagger Hilt, Android SDK, Gradle',
+      metadata: { type: 'skill', domain: 'android' }
+    },
+    {
+      id: 'skills-web',
+      content: 'Web development expertise: React, Next.js, TypeScript, TailwindCSS, Framer Motion, REST APIs, GraphQL, Node.js, Responsive Design, Progressive Web Apps',
+      metadata: { type: 'skill', domain: 'web' }
+    },
+    // ... more skills
+  ];
+
+  for (const chunk of chunks) {
+    // Generate embedding
+    const embeddingResponse = await openai.embeddings.create({
+      model: 'text-embedding-3-small',
+      input: chunk.content,
+    });
+
+    const embedding = embeddingResponse.data[0].embedding;
+
+    // Store in Supabase
+    await supabase.from('portfolio_embeddings').insert({
+      id: chunk.id,
+      content: chunk.content,
+      metadata: chunk.metadata,
+      embedding: embedding,
+    });
+  }
+
+  console.log(`Generated embeddings for ${chunks.length} chunks`);
+}
+
+generateEmbeddings();
+```
+
+**2. Create Supabase Table**:
+
+```sql
+-- Run in Supabase SQL Editor
+create extension if not exists vector;
+
+create table portfolio_embeddings (
+  id text primary key,
+  content text not null,
+  metadata jsonb not null,
+  embedding vector(1536) not null
+);
+
+-- Create index for fast similarity search
+create index on portfolio_embeddings using ivfflat (embedding vector_cosine_ops)
+  with (lists = 100);
+
+-- Function for similarity search
+create function match_portfolio_chunks(
+  query_embedding vector(1536),
+  match_threshold float,
+  match_count int
+)
+returns table (
+  id text,
+  content text,
+  metadata jsonb,
+  similarity float
+)
+language sql stable
+as $$
+  select
+    id,
+    content,
+    metadata,
+    1 - (embedding <=> query_embedding) as similarity
+  from portfolio_embeddings
+  where 1 - (embedding <=> query_embedding) > match_threshold
+  order by similarity desc
+  limit match_count;
+$$;
+```
+
+### API Route Implementation
+
+```typescript
+// app/api/chat/route.ts
+import { OpenAI } from 'openai';
+import { createClient } from '@supabase/supabase-js';
+import { OpenAIStream, StreamingTextResponse } from 'ai';
+
+export const runtime = 'edge';
+
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
+const supabase = createClient(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
+
+export async function POST(req: Request) {
+  const { messages } = await req.json();
+  const userQuestion = messages[messages.length - 1].content;
+
+  // 1. Generate embedding for user question
+  const embeddingResponse = await openai.embeddings.create({
+    model: 'text-embedding-3-small',
+    input: userQuestion,
+  });
+  const questionEmbedding = embeddingResponse.data[0].embedding;
+
+  // 2. Retrieve relevant context from Supabase
+  const { data: matches } = await supabase.rpc('match_portfolio_chunks', {
+    query_embedding: questionEmbedding,
+    match_threshold: 0.5,
+    match_count: 5,
+  });
+
+  // 3. Build context from matches
+  const context = matches
+    ?.map((match: any) => match.content)
+    .join('\n\n---\n\n') || 'No relevant context found.';
+
+  // 4. Create system prompt with context
+  const systemPrompt = `You are an AI assistant for Pigo's portfolio. Answer questions about their career, projects, and skills based on the following context.
+
+Context:
+${context}
+
+Instructions:
+- Only answer based on the provided context
+- If the context doesn't contain relevant information, say "I don't have information about that in Pigo's portfolio"
+- Be conversational but professional
+- Highlight specific projects, metrics, and achievements when relevant
+- If asked about contact info, direct to the contact section`;
+
+  // 5. Stream response from GPT-4
+  const response = await openai.chat.completions.create({
+    model: 'gpt-4-turbo-preview',
+    stream: true,
+    messages: [
+      { role: 'system', content: systemPrompt },
+      ...messages,
+    ],
+    temperature: 0.7,
+    max_tokens: 500,
+  });
+
+  const stream = OpenAIStream(response);
+  return new StreamingTextResponse(stream);
+}
+```
+
+### Frontend Component
+
+```tsx
+// components/chat/AIChatbot.tsx
+'use client';
+
+import { useChat } from 'ai/react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useState } from 'react';
+
+export function AIChatbot() {
+  const [isOpen, setIsOpen] = useState(false);
+  const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
+    api: '/api/chat',
+  });
+
+  return (
+    <>
+      {/* Floating Action Button */}
+      <motion.button
+        className="fixed bottom-8 right-8 w-16 h-16 rounded-full shadow-2xl flex items-center justify-center z-50"
+        style={{
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        }}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.9 }}
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        {isOpen ? (
+          <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        ) : (
+          <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+          </svg>
+        )}
+      </motion.button>
+
+      {/* Chat Panel */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            className="fixed bottom-28 right-8 w-96 h-[600px] rounded-2xl shadow-2xl overflow-hidden z-40"
+            style={{
+              background: 'rgba(0, 0, 0, 0.95)',
+              backdropFilter: 'blur(20px)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+            }}
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+          >
+            {/* Header */}
+            <div className="p-6 border-b border-white/10">
+              <h3 className="text-xl font-bold text-white">Ask me anything</h3>
+              <p className="text-sm text-white/60 mt-1">About Pigo's career, projects, or skills</p>
+            </div>
+
+            {/* Messages */}
+            <div className="h-[420px] overflow-y-auto p-6 space-y-4">
+              {messages.length === 0 && (
+                <div className="text-center text-white/40 mt-8">
+                  <p className="text-sm">Try asking:</p>
+                  <div className="mt-4 space-y-2">
+                    {[
+                      'What are your Android skills?',
+                      'Tell me about your web projects',
+                      'What's your experience with Forex trading?',
+                    ].map((suggestion) => (
+                      <button
+                        key={suggestion}
+                        onClick={() => {
+                          handleInputChange({ target: { value: suggestion } } as any);
+                          handleSubmit({ preventDefault: () => {} } as any);
+                        }}
+                        className="block w-full text-left px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-xs text-white/60"
+                      >
+                        {suggestion}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {messages.map((message) => (
+                <motion.div
+                  key={message.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                >
+                  <div
+                    className={`max-w-[80%] px-4 py-3 rounded-2xl ${
+                      message.role === 'user'
+                        ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
+                        : 'bg-white/10 text-white/90'
+                    }`}
+                  >
+                    <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
+                  </div>
+                </motion.div>
+              ))}
+
+              {isLoading && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="flex justify-start"
+                >
+                  <div className="bg-white/10 px-4 py-3 rounded-2xl">
+                    <div className="flex space-x-2">
+                      <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                      <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                      <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </div>
+
+            {/* Input */}
+            <form onSubmit={handleSubmit} className="p-4 border-t border-white/10">
+              <div className="flex items-center gap-2">
+                <input
+                  value={input}
+                  onChange={handleInputChange}
+                  placeholder="Type your question..."
+                  className="flex-1 px-4 py-3 rounded-xl bg-white/10 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="px-6 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-medium hover:opacity-90 disabled:opacity-50 transition-opacity"
+                >
+                  Send
+                </button>
+              </div>
+            </form>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
+  );
+}
+```
+
+### Environment Setup
+
+```bash
+# .env.local
+OPENAI_API_KEY=sk-...
+SUPABASE_URL=https://xxx.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=eyJhbG...
+```
+
+### Cost Optimization
+
+```typescript
+// Batch embeddings generation to reduce API calls
+// Use text-embedding-3-small ($0.02/1M tokens) instead of ada-002
+// Cache frequently asked questions
+// Implement rate limiting: max 10 messages per session
+
+// lib/cache/qa-cache.ts
+const commonQA = {
+  'what are your skills': 'I specialize in Android (Kotlin, Jetpack Compose), Web (React, Next.js, TypeScript), Forex trading, Data Analysis (Python, SQL), and UI/UX Design (Figma, Adobe XD).',
+  'how can i contact you': 'You can reach me via the contact form at the bottom of this page, or email me directly.',
+  // ... more cached responses
+};
+
+export function getCachedResponse(question: string): string | null {
+  const normalized = question.toLowerCase().trim();
+  return commonQA[normalized] || null;
+}
+```
+
+---
+
+## 7.3 Device-Context Optimization System
+
+### Core Concept
+
+Automatically adjust features, animations, and data based on device capabilities. High-end devices get full experience; low-end devices get optimized version without sacrificing usability.
+
+### Device Tier Detection
+
+```typescript
+// lib/performance/device-detection.ts
+export type DeviceTier = 'high' | 'medium' | 'low';
+
+export function detectDeviceTier(): DeviceTier {
+  // Server-side detection (User-Agent)
+  if (typeof navigator === 'undefined') return 'medium';
+
+  const ua = navigator.userAgent;
+
+  // Check for high-end indicators
+  const isHighEnd =
+    navigator.hardwareConcurrency >= 8 ||  // 8+ CPU cores
+    /iPad Pro|iPhone 14 Pro|iPhone 15|Pixel 7 Pro|Galaxy S23/.test(ua);
+
+  if (isHighEnd) return 'high';
+
+  // Check for low-end indicators
+  const isLowEnd =
+    navigator.hardwareConcurrency <= 2 ||   // 2 or fewer cores
+    /Android 4|Android 5|iPhone 6|iPhone 7/.test(ua) ||
+    (navigator as any).connection?.saveData;  // Data Saver mode
+
+  if (isLowEnd) return 'low';
+
+  return 'medium';
+}
+
+// Client-side performance measurement
+export async function measureDevicePerformance(): Promise<DeviceTier> {
+  const tier = detectDeviceTier();
+
+  // Run FPS test
+  const fps = await measureFPS();
+
+  // Adjust tier based on actual performance
+  if (fps < 30 && tier !== 'low') return 'low';
+  if (fps >= 55 && tier === 'low') return 'medium';
+
+  return tier;
+}
+
+async function measureFPS(): Promise<number> {
+  return new Promise((resolve) => {
+    let frameCount = 0;
+    const startTime = performance.now();
+
+    function countFrame() {
+      frameCount++;
+      const elapsed = performance.now() - startTime;
+
+      if (elapsed < 1000) {
+        requestAnimationFrame(countFrame);
+      } else {
+        resolve(frameCount);
+      }
+    }
+
+    requestAnimationFrame(countFrame);
+  });
+}
+```
+
+### Adaptive Features Matrix
+
+```typescript
+// lib/performance/feature-matrix.ts
+export interface FeatureConfig {
+  animations: {
+    enabled: boolean;
+    complexity: 'simple' | 'medium' | 'complex';
+    particleCount: number;
+    blurEffects: boolean;
+  };
+  images: {
+    format: 'avif' | 'webp' | 'jpeg';
+    quality: number;
+    lazyLoad: boolean;
+    placeholder: 'blur' | 'color' | 'none';
+  };
+  canvas: {
+    enabled: boolean;
+    resolution: number;  // 0.5 = half resolution, 1 = full
+    fps: number;
+  };
+  interactions: {
+    customCursor: boolean;
+    hoverEffects: boolean;
+    parallax: boolean;
+  };
+}
+
+export const featureConfigs: Record<DeviceTier, FeatureConfig> = {
+  high: {
+    animations: {
+      enabled: true,
+      complexity: 'complex',
+      particleCount: 100,
+      blurEffects: true,
+    },
+    images: {
+      format: 'avif',
+      quality: 90,
+      lazyLoad: true,
+      placeholder: 'blur',
+    },
+    canvas: {
+      enabled: true,
+      resolution: 1,
+      fps: 60,
+    },
+    interactions: {
+      customCursor: true,
+      hoverEffects: true,
+      parallax: true,
+    },
+  },
+  medium: {
+    animations: {
+      enabled: true,
+      complexity: 'medium',
+      particleCount: 50,
+      blurEffects: true,
+    },
+    images: {
+      format: 'webp',
+      quality: 80,
+      lazyLoad: true,
+      placeholder: 'color',
+    },
+    canvas: {
+      enabled: true,
+      resolution: 0.75,
+      fps: 30,
+    },
+    interactions: {
+      customCursor: true,
+      hoverEffects: true,
+      parallax: false,
+    },
+  },
+  low: {
+    animations: {
+      enabled: false,
+      complexity: 'simple',
+      particleCount: 0,
+      blurEffects: false,
+    },
+    images: {
+      format: 'jpeg',
+      quality: 70,
+      lazyLoad: true,
+      placeholder: 'none',
+    },
+    canvas: {
+      enabled: false,
+      resolution: 0.5,
+      fps: 0,
+    },
+    interactions: {
+      customCursor: false,
+      hoverEffects: false,
+      parallax: false,
+    },
+  },
+};
+```
+
+### Performance Context Provider
+
+```tsx
+// components/providers/PerformanceProvider.tsx
+'use client';
+
+import { createContext, useContext, useEffect, useState } from 'react';
+import { DeviceTier, measureDevicePerformance, featureConfigs, FeatureConfig } from '@/lib/performance';
+
+interface PerformanceContextType {
+  tier: DeviceTier;
+  config: FeatureConfig;
+  isReady: boolean;
+}
+
+const PerformanceContext = createContext<PerformanceContextType>({
+  tier: 'medium',
+  config: featureConfigs.medium,
+  isReady: false,
+});
+
+export function PerformanceProvider({ children }: { children: React.ReactNode }) {
+  const [tier, setTier] = useState<DeviceTier>('medium');
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    async function detectPerformance() {
+      const detectedTier = await measureDevicePerformance();
+      setTier(detectedTier);
+      setIsReady(true);
+
+      // Store in localStorage to avoid re-detection
+      localStorage.setItem('device-tier', detectedTier);
+
+      console.log(`Device tier: ${detectedTier}`);
+    }
+
+    // Check cached tier first
+    const cachedTier = localStorage.getItem('device-tier') as DeviceTier | null;
+    if (cachedTier) {
+      setTier(cachedTier);
+      setIsReady(true);
+    } else {
+      detectPerformance();
+    }
+  }, []);
+
+  return (
+    <PerformanceContext.Provider value={{ tier, config: featureConfigs[tier], isReady }}>
+      {children}
+    </PerformanceContext.Provider>
+  );
+}
+
+export const usePerformance = () => useContext(PerformanceContext);
+```
+
+### Adaptive Components
+
+```tsx
+// components/adaptive/AdaptiveBackgroundPattern.tsx
+'use client';
+
+import { usePerformance } from '@/components/providers/PerformanceProvider';
+import { BackgroundPattern } from './BackgroundPattern';
+
+export function AdaptiveBackgroundPattern() {
+  const { config, isReady } = usePerformance();
+
+  if (!isReady) {
+    // Show simple gradient while detecting
+    return (
+      <div className="fixed inset-0 -z-10 bg-gradient-to-br from-gray-900 via-black to-gray-900" />
+    );
+  }
+
+  if (!config.canvas.enabled) {
+    // Low-end: Static gradient instead of canvas
+    return (
+      <div className="fixed inset-0 -z-10 bg-gradient-to-br from-gray-900 via-black to-gray-900">
+        <div className="absolute inset-0 opacity-10"
+          style={{
+            backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px)',
+            backgroundSize: '50px 50px',
+          }}
+        />
+      </div>
+    );
+  }
+
+  // Medium/High: Full canvas animation
+  return (
+    <BackgroundPattern
+      particleCount={config.animations.particleCount}
+      fps={config.canvas.fps}
+      resolution={config.canvas.resolution}
+    />
+  );
+}
+```
+
+```tsx
+// components/adaptive/AdaptiveImage.tsx
+import { usePerformance } from '@/components/providers/PerformanceProvider';
+import Image from 'next/image';
+
+interface AdaptiveImageProps {
+  src: string;
+  alt: string;
+  width: number;
+  height: number;
+  priority?: boolean;
+}
+
+export function AdaptiveImage({ src, alt, width, height, priority }: AdaptiveImageProps) {
+  const { config } = usePerformance();
+
+  // Generate source URLs for different formats
+  const avifSrc = src.replace(/\.(jpg|png)$/, '.avif');
+  const webpSrc = src.replace(/\.(jpg|png)$/, '.webp');
+
+  return (
+    <Image
+      src={config.images.format === 'avif' ? avifSrc : config.images.format === 'webp' ? webpSrc : src}
+      alt={alt}
+      width={width}
+      height={height}
+      quality={config.images.quality}
+      loading={config.images.lazyLoad && !priority ? 'lazy' : 'eager'}
+      placeholder={config.images.placeholder}
+      blurDataURL={config.images.placeholder === 'blur' ? `/blur/${src}` : undefined}
+    />
+  );
+}
+```
+
+### Network-Aware Loading
+
+```typescript
+// lib/performance/network-detection.ts
+export type NetworkSpeed = 'fast' | 'moderate' | 'slow';
+
+export function detectNetworkSpeed(): NetworkSpeed {
+  if (typeof navigator === 'undefined') return 'moderate';
+
+  const connection = (navigator as any).connection;
+  if (!connection) return 'moderate';
+
+  const { effectiveType, saveData } = connection;
+
+  if (saveData) return 'slow';
+
+  if (effectiveType === '4g') return 'fast';
+  if (effectiveType === '3g') return 'moderate';
+  return 'slow';
+}
+
+// Prefetch strategy based on network
+export function shouldPrefetch(resource: 'image' | 'data' | 'script'): boolean {
+  const speed = detectNetworkSpeed();
+
+  const strategies = {
+    fast: { image: true, data: true, script: true },
+    moderate: { image: true, data: false, script: true },
+    slow: { image: false, data: false, script: true },  // Only critical scripts
+  };
+
+  return strategies[speed][resource];
+}
+```
+
+### Analytics Integration
+
+```typescript
+// Track performance metrics to optimize over time
+export function reportPerformanceMetrics(tier: DeviceTier) {
+  if (typeof window === 'undefined') return;
+
+  const metrics = {
+    deviceTier: tier,
+    fps: 0,
+    lcp: 0,  // Largest Contentful Paint
+    fid: 0,  // First Input Delay
+    cls: 0,  // Cumulative Layout Shift
+  };
+
+  // Measure Web Vitals
+  if ('web-vitals' in window) {
+    import('web-vitals').then(({ onLCP, onFID, onCLS }) => {
+      onLCP((metric) => metrics.lcp = metric.value);
+      onFID((metric) => metrics.fid = metric.value);
+      onCLS((metric) => metrics.cls = metric.value);
+
+      // Send to analytics after 10 seconds
+      setTimeout(() => {
+        console.log('Performance Metrics:', metrics);
+        // analytics.track('performance_metrics', metrics);
+      }, 10000);
+    });
+  }
+}
+```
+
+---
+
+# Chapter 8: 🧠 UX Psychology & Adaptive Intelligence
+
+This chapter covers how The Prism Portfolio uses psychological principles and adaptive AI to create personalized, engaging experiences.
+
+---
+
+## 8.1 Audience Detection & Personalization
+
+### Core Concept
+
+Detect visitor intent and adjust content emphasis based on their behavior. A recruiter sees different highlights than a potential client or fellow developer.
+
+### Behavioral Signals
+
+```typescript
+// lib/analytics/audience-detection.ts
+export type AudienceType = 'recruiter' | 'client' | 'developer' | 'unknown';
+
+interface BehaviorSignal {
+  type: string;
+  weight: number;
+  timestamp: number;
+}
+
+export class AudienceDetector {
+  private signals: BehaviorSignal[] = [];
+
+  trackPageView(path: string) {
+    // Recruiters often go straight to experience/timeline
+    if (path.includes('experience') || path.includes('timeline')) {
+      this.signals.push({ type: 'recruiter_indicator', weight: 2, timestamp: Date.now() });
+    }
+
+    // Clients focus on specific projects and case studies
+    if (path.includes('projects')) {
+      this.signals.push({ type: 'client_indicator', weight: 1.5, timestamp: Date.now() });
+    }
+
+    // Developers check code samples and GitHub links
+    if (path.includes('github') || path.includes('code')) {
+      this.signals.push({ type: 'developer_indicator', weight: 2, timestamp: Date.now() });
+    }
+  }
+
+  trackInteraction(element: string, duration: number) {
+    // Long reads of project descriptions = client
+    if (element.includes('project-description') && duration > 10000) {
+      this.signals.push({ type: 'client_indicator', weight: 1, timestamp: Date.now() });
+    }
+
+    // Hovering over skills/tech stack = recruiter
+    if (element.includes('skill') || element.includes('technology')) {
+      this.signals.push({ type: 'recruiter_indicator', weight: 0.5, timestamp: Date.now() });
+    }
+
+    // Viewing timeline in detail = recruiter
+    if (element.includes('timeline') && duration > 5000) {
+      this.signals.push({ type: 'recruiter_indicator', weight: 1.5, timestamp: Date.now() });
+    }
+  }
+
+  detectAudience(): AudienceType {
+    // Weight recent signals more heavily (decay over time)
+    const now = Date.now();
+    const weightedScores = this.signals.reduce((scores, signal) => {
+      const age = now - signal.timestamp;
+      const decay = Math.exp(-age / 60000);  // Decay over 1 minute
+      const adjustedWeight = signal.weight * decay;
+
+      scores[signal.type] = (scores[signal.type] || 0) + adjustedWeight;
+      return scores;
+    }, {} as Record<string, number>);
+
+    // Determine audience type
+    const recruiterScore = weightedScores.recruiter_indicator || 0;
+    const clientScore = weightedScores.client_indicator || 0;
+    const developerScore = weightedScores.developer_indicator || 0;
+
+    const maxScore = Math.max(recruiterScore, clientScore, developerScore);
+
+    if (maxScore < 2) return 'unknown';
+    if (maxScore === recruiterScore) return 'recruiter';
+    if (maxScore === clientScore) return 'client';
+    return 'developer';
+  }
+}
+```
+
+### Adaptive Content Highlighting
+
+```tsx
+// components/adaptive/AdaptiveProjectCard.tsx
+'use client';
+
+import { useAudience } from '@/lib/hooks/useAudience';
+import { Project } from '@/lib/data/projects';
+
+export function AdaptiveProjectCard({ project }: { project: Project }) {
+  const audience = useAudience();
+
+  return (
+    <div className="project-card">
+      <h3>{project.title}</h3>
+
+      {/* Recruiters see technologies prominently */}
+      {audience === 'recruiter' && (
+        <div className="tech-stack-highlight">
+          <span className="label">Tech Stack:</span>
+          <div className="tech-badges">
+            {project.technologies.map(tech => (
+              <span key={tech} className="badge">{tech}</span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Clients see business impact */}
+      {audience === 'client' && project.impactMetrics && (
+        <div className="impact-highlight">
+          <span className="label">Business Impact:</span>
+          <div className="metrics-grid">
+            {project.impactMetrics.map(metric => (
+              <div key={metric.label} className="metric">
+                <div className="metric-value">{metric.value}</div>
+                <div className="metric-label">{metric.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Developers see code links and architecture */}
+      {audience === 'developer' && (
+        <div className="code-highlight">
+          {project.githubLink && (
+            <a href={project.githubLink} className="github-link">
+              View Source Code →
+            </a>
+          )}
+          {project.architecture && (
+            <p className="architecture-note">
+              Architecture: {project.architecture}
+            </p>
+          )}
+        </div>
+      )}
+
+      {/* Everyone sees description */}
+      <p className="description">{project.description}</p>
+    </div>
+  );
+}
+```
+
+### Smart CTA Variation
+
+```tsx
+// components/adaptive/SmartCTA.tsx
+export function SmartCTA() {
+  const audience = useAudience();
+
+  const ctas = {
+    recruiter: {
+      primary: 'Download Resume',
+      secondary: 'View Full Experience Timeline',
+      link: '/resume.pdf',
+    },
+    client: {
+      primary: 'Start a Project',
+      secondary: 'View Case Studies',
+      link: '/contact',
+    },
+    developer: {
+      primary: 'Explore Code',
+      secondary: 'Connect on GitHub',
+      link: 'https://github.com/username',
+    },
+    unknown: {
+      primary: 'Get in Touch',
+      secondary: 'Learn More',
+      link: '/contact',
+    },
+  };
+
+  const cta = ctas[audience];
+
+  return (
+    <div className="cta-section">
+      <a href={cta.link} className="btn-primary">
+        {cta.primary}
+      </a>
+      <button className="btn-secondary">
+        {cta.secondary}
+      </button>
+    </div>
+  );
+}
+```
+
+---
+
+## 8.2 Dopamine Design & Ethical Engagement
+
+### Core Concept
+
+Use reward loops and micro-interactions to create delightful experiences without being manipulative. Follow ethical design principles.
+
+### Micro-Interactions Library
+
+```tsx
+// components/interactions/SuccessConfetti.tsx
+'use client';
+
+import confetti from 'canvas-confetti';
+
+export function triggerSuccessConfetti() {
+  confetti({
+    particleCount: 100,
+    spread: 70,
+    origin: { y: 0.6 },
+    colors: ['#3DDC84', '#03DAC5', '#6200EE'],
+  });
+}
+
+// Trigger on meaningful actions
+// - Project card click
+// - Contact form submission
+// - Newsletter signup
+// - Download resume
+```
+
+```tsx
+// components/interactions/ProgressIndicator.tsx
+export function ProgressIndicator({ current, total }: { current: number; total: number }) {
+  const percentage = (current / total) * 100;
+
+  return (
+    <div className="progress-bar">
+      <motion.div
+        className="progress-fill"
+        initial={{ width: 0 }}
+        animate={{ width: `${percentage}%` }}
+        transition={{ duration: 0.5, ease: 'easeOut' }}
+      />
+      <span className="progress-text">{current}/{total} sections viewed</span>
+    </div>
+  );
+}
+```
+
+### Scroll Progress Rewards
+
+```tsx
+// components/interactions/ScrollMilestones.tsx
+'use client';
+
+import { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+
+export function ScrollMilestones() {
+  const [milestones, setMilestones] = useState<number[]>([]);
+
+  useEffect(() => {
+    function handleScroll() {
+      const scrollPercentage = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+
+      const thresholds = [25, 50, 75, 100];
+      const newMilestones = thresholds.filter(
+        threshold => scrollPercentage >= threshold && !milestones.includes(threshold)
+      );
+
+      if (newMilestones.length > 0) {
+        setMilestones([...milestones, ...newMilestones]);
+        // Trigger reward animation
+        newMilestones.forEach(milestone => {
+          showMilestoneToast(milestone);
+        });
+      }
+    }
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [milestones]);
+
+  return null;  // Toast handled separately
+}
+
+function showMilestoneToast(percentage: number) {
+  const messages = {
+    25: '🎯 Great start! Keep exploring',
+    50: '🚀 Halfway through! You\'re doing great',
+    75: '⭐ Almost there! Just a bit more',
+    100: '🎉 You made it! Thanks for scrolling through',
+  };
+
+  // Show toast notification
+  toast.success(messages[percentage]);
+}
+```
+
+### Interactive Easter Eggs
+
+```tsx
+// components/interactions/KonamiCode.tsx
+'use client';
+
+import { useEffect, useState } from 'react';
+
+const KONAMI_CODE = [
+  'ArrowUp',
+  'ArrowUp',
+  'ArrowDown',
+  'ArrowDown',
+  'ArrowLeft',
+  'ArrowRight',
+  'ArrowLeft',
+  'ArrowRight',
+  'KeyB',
+  'KeyA',
+];
+
+export function KonamiCodeDetector() {
+  const [keys, setKeys] = useState<string[]>([]);
+
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      setKeys(prev => [...prev, e.code].slice(-10));
+    }
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  useEffect(() => {
+    if (keys.join(',') === KONAMI_CODE.join(',')) {
+      // Unlock secret developer mode
+      activateDevMode();
+      setKeys([]);
+    }
+  }, [keys]);
+
+  return null;
+}
+
+function activateDevMode() {
+  // Enable hidden features:
+  // - View source code for all components
+  // - Show performance metrics overlay
+  // - Enable advanced debug mode
+
+  document.documentElement.classList.add('dev-mode-active');
+
+  confetti({
+    particleCount: 200,
+    spread: 180,
+    origin: { y: 0.5 },
+    shapes: ['square'],
+    colors: ['#FF0000', '#00FF00', '#0000FF'],
+  });
+
+  toast.success('🎮 Developer Mode Activated!');
+}
+```
+
+### Gamification Elements
+
+```typescript
+// lib/gamification/achievements.ts
+export interface Achievement {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+  unlocked: boolean;
+  unlockedAt?: Date;
+}
+
+export const achievements: Achievement[] = [
+  {
+    id: 'explorer',
+    title: 'Explorer',
+    description: 'Visited all 5 domain pages',
+    icon: '🗺️',
+    unlocked: false,
+  },
+  {
+    id: 'time-traveler',
+    title: 'Time Traveler',
+    description: 'Explored the entire career timeline',
+    icon: '⏰',
+    unlocked: false,
+  },
+  {
+    id: 'code-curious',
+    title: 'Code Curious',
+    description: 'Viewed source code on GitHub',
+    icon: '👨‍💻',
+    unlocked: false,
+  },
+  {
+    id: 'interaction-master',
+    title: 'Interaction Master',
+    description: 'Tried all interactive features',
+    icon: '🎮',
+    unlocked: false,
+  },
+  {
+    id: 'ai-whisperer',
+    title: 'AI Whisperer',
+    description: 'Had a conversation with the AI chatbot',
+    icon: '🤖',
+    unlocked: false,
+  },
+];
+
+export function unlockAchievement(id: string) {
+  const achievement = achievements.find(a => a.id === id);
+  if (!achievement || achievement.unlocked) return;
+
+  achievement.unlocked = true;
+  achievement.unlockedAt = new Date();
+
+  // Save to localStorage
+  const unlocked = JSON.parse(localStorage.getItem('achievements') || '[]');
+  unlocked.push({ id, unlockedAt: achievement.unlockedAt });
+  localStorage.setItem('achievements', JSON.stringify(unlocked));
+
+  // Show toast
+  toast.success(
+    <div className="achievement-toast">
+      <span className="achievement-icon">{achievement.icon}</span>
+      <div>
+        <div className="achievement-title">{achievement.title}</div>
+        <div className="achievement-description">{achievement.description}</div>
+      </div>
+    </div>
+  );
+
+  // Trigger confetti
+  triggerSuccessConfetti();
+}
+```
+
+---
+
+## 8.3 INTP-T Personality Optimization
+
+### Core Concept
+
+Design decisions reflect INTP-T traits: analytical depth, creative exploration, intellectual curiosity, and independence.
+
+### Information Architecture for Analysts
+
+```
+INTP-T users want to:
+1. Understand systems deeply (show architecture diagrams)
+2. Explore at their own pace (non-linear navigation)
+3. Access technical details (expandable code sections)
+4. See logical connections (visualize relationships)
+```
+
+**Implementation**:
+
+```tsx
+// components/architecture/SystemDiagram.tsx
+export function SystemDiagram({ project }: { project: Project }) {
+  return (
+    <div className="system-diagram">
+      <h4>System Architecture</h4>
+
+      {/* Interactive architecture visualization */}
+      <svg viewBox="0 0 800 600" className="architecture-svg">
+        {/* Components */}
+        <g className="layer frontend">
+          <rect x="50" y="50" width="200" height="100" rx="8" className="component" />
+          <text x="150" y="105" textAnchor="middle">React Frontend</text>
+        </g>
+
+        <g className="layer backend">
+          <rect x="50" y="200" width="200" height="100" rx="8" className="component" />
+          <text x="150" y="255" textAnchor="middle">Next.js API</text>
+        </g>
+
+        <g className="layer database">
+          <rect x="50" y="350" width="200" height="100" rx="8" className="component" />
+          <text x="150" y="405" textAnchor="middle">PostgreSQL</text>
+        </g>
+
+        {/* Connections */}
+        <line x1="150" y1="150" x2="150" y2="200" stroke="currentColor" strokeWidth="2" markerEnd="url(#arrowhead)" />
+        <line x1="150" y1="300" x2="150" y2="350" stroke="currentColor" strokeWidth="2" markerEnd="url(#arrowhead)" />
+      </svg>
+    </div>
+  );
+}
+```
+
+### Deep-Dive Expandable Sections
+
+```tsx
+// components/content/ExpandableDeepDive.tsx
+export function ExpandableDeepDive({ title, content }: { title: string; content: React.ReactNode }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  return (
+    <div className="deep-dive-section">
+      <button
+        onClick={() => setIsExpanded(!isExpanded)}
+        className="deep-dive-trigger"
+      >
+        <span>{title}</span>
+        <span className="icon">{isExpanded ? '−' : '+'}</span>
+      </button>
+
+      <AnimatePresence>
+        {isExpanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="deep-dive-content"
+          >
+            {content}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+// Usage:
+<ExpandableDeepDive
+  title="Technical Implementation Details"
+  content={
+    <div>
+      <h5>Architecture Decisions</h5>
+      <p>Chose MVVM over MVC because...</p>
+      <pre><code>// Code example</code></pre>
+    </div>
+  }
+/>
+```
+
+### Non-Linear Exploration
+
+```tsx
+// components/navigation/GraphNavigation.tsx
+export function GraphNavigation() {
+  // Show connections between projects, skills, and experiences
+  // INTP-T users love seeing how things relate
+
+  return (
+    <div className="graph-nav">
+      <svg className="connection-graph">
+        {/* Nodes */}
+        <circle cx="100" cy="100" r="40" className="node project" />
+        <text x="100" y="105">Android App</text>
+
+        <circle cx="300" cy="100" r="40" className="node skill" />
+        <text x="300" y="105">Kotlin</text>
+
+        <circle cx="200" cy="250" r="40" className="node experience" />
+        <text x="200" y="255">Google Internship</text>
+
+        {/* Edges */}
+        <line x1="140" y1="100" x2="260" y2="100" stroke="currentColor" />
+        <line x1="100" y1="140" x2="200" y2="210" stroke="currentColor" />
+      </svg>
+    </div>
+  );
+}
+```
+
+---
+
+# Chapter 9: 🌍 MENA Market Optimization
+
+This chapter covers adaptations for Middle East & North Africa audiences: RTL support, Arabic typography, cultural considerations.
+
+---
+
+## 9.1 RTL (Right-to-Left) Implementation
+
+### Automatic Language Detection
+
+```typescript
+// lib/i18n/language-detection.ts
+export type Language = 'en' | 'ar';
+
+export function detectLanguage(): Language {
+  // Check browser language
+  const browserLang = navigator.language;
+  if (browserLang.startsWith('ar')) return 'ar';
+
+  // Check user preference (localStorage)
+  const savedLang = localStorage.getItem('preferred-language') as Language;
+  if (savedLang) return savedLang;
+
+  return 'en';
+}
+```
+
+### RTL Provider
+
+```tsx
+// components/providers/RTLProvider.tsx
+'use client';
+
+import { createContext, useContext, useEffect, useState } from 'react';
+import { Language, detectLanguage } from '@/lib/i18n/language-detection';
+
+interface RTLContextType {
+  language: Language;
+  direction: 'ltr' | 'rtl';
+  setLanguage: (lang: Language) => void;
+}
+
+const RTLContext = createContext<RTLContextType>({
+  language: 'en',
+  direction: 'ltr',
+  setLanguage: () => {},
+});
+
+export function RTLProvider({ children }: { children: React.ReactNode }) {
+  const [language, setLanguageState] = useState<Language>('en');
+
+  useEffect(() => {
+    const detected = detectLanguage();
+    setLanguageState(detected);
+  }, []);
+
+  useEffect(() => {
+    const direction = language === 'ar' ? 'rtl' : 'ltr';
+    document.documentElement.dir = direction;
+    document.documentElement.lang = language;
+
+    // Save preference
+    localStorage.setItem('preferred-language', language);
+  }, [language]);
+
+  const setLanguage = (lang: Language) => {
+    setLanguageState(lang);
+  };
+
+  const direction = language === 'ar' ? 'rtl' : 'ltr';
+
+  return (
+    <RTLContext.Provider value={{ language, direction, setLanguage }}>
+      {children}
+    </RTLContext.Provider>
+  );
+}
+
+export const useRTL = () => useContext(RTLContext);
+```
+
+### RTL-Aware Styling
+
+```css
+/* globals.css */
+
+/* Directional utilities */
+[dir="rtl"] .ml-4 { margin-left: 0; margin-right: 1rem; }
+[dir="rtl"] .mr-4 { margin-right: 0; margin-left: 1rem; }
+[dir="rtl"] .pl-4 { padding-left: 0; padding-right: 1rem; }
+[dir="rtl"] .pr-4 { padding-right: 0; padding-left: 1rem; }
+
+[dir="rtl"] .text-left { text-align: right; }
+[dir="rtl"] .text-right { text-align: left; }
+
+/* RTL-safe flexbox */
+[dir="rtl"] .flex-row { flex-direction: row-reverse; }
+
+/* RTL-safe transforms */
+[dir="rtl"] .translate-x-4 { transform: translateX(-1rem); }
+
+/* Icons that shouldn't flip */
+[dir="rtl"] .no-flip {
+  transform: scaleX(-1);
+}
+```
+
+**Tailwind RTL Plugin**:
+
+```javascript
+// tailwind.config.js
+module.exports = {
+  plugins: [
+    require('tailwindcss-rtl'),
+  ],
+};
+
+// Usage:
+// <div className="ms-4">  // margin-start (left in LTR, right in RTL)
+// <div className="me-4">  // margin-end (right in LTR, left in RTL)
+// <div className="ps-4">  // padding-start
+// <div className="pe-4">  // padding-end
+```
+
+---
+
+## 9.2 Arabic Typography System
+
+### Font Stack
+
+```typescript
+// lib/fonts/arabic-fonts.ts
+import { Cairo, Tajawal, Amiri } from 'next/font/google';
+
+export const cairo = Cairo({
+  subsets: ['arabic', 'latin'],
+  display: 'swap',
+  variable: '--font-cairo',
+});
+
+export const tajawal = Tajawal({
+  weight: ['400', '500', '700', '900'],
+  subsets: ['arabic', 'latin'],
+  display: 'swap',
+  variable: '--font-tajawal',
+});
+
+export const amiri = Amiri({
+  weight: ['400', '700'],
+  subsets: ['arabic', 'latin'],
+  display: 'swap',
+  variable: '--font-amiri',
+});
+```
+
+### Usage in Layout
+
+```tsx
+// app/layout.tsx
+import { cairo, tajawal } from '@/lib/fonts/arabic-fonts';
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html className={`${cairo.variable} ${tajawal.variable}`}>
+      <body>{children}</body>
+    </html>
+  );
+}
+```
+
+### CSS Configuration
+
+```css
+/* globals.css */
+
+/* English font stack */
+[lang="en"] {
+  --font-heading: 'Google Sans', 'Inter', sans-serif;
+  --font-body: 'Roboto', 'Inter', sans-serif;
+  --font-code: 'JetBrains Mono', monospace;
+}
+
+/* Arabic font stack */
+[lang="ar"] {
+  --font-heading: var(--font-cairo), sans-serif;
+  --font-body: var(--font-tajawal), sans-serif;
+  --font-code: 'Courier New', monospace;  /* Arabic code fonts limited */
+}
+
+/* Arabic text needs larger sizes */
+[lang="ar"] {
+  font-size: 1.125em;  /* 18px base instead of 16px */
+}
+
+[lang="ar"] h1 { font-size: 3rem; }  /* Slightly larger than English */
+[lang="ar"] h2 { font-size: 2.25rem; }
+[lang="ar"] h3 { font-size: 1.875rem; }
+```
+
+---
+
+## 9.3 Internationalization (i18n)
+
+### Translation System
+
+```typescript
+// lib/i18n/translations.ts
+export const translations = {
+  en: {
+    nav: {
+      home: 'Home',
+      android: 'Android',
+      web: 'Web',
+      forex: 'Forex',
+      data: 'Data Analysis',
+      design: 'Design',
+      contact: 'Contact',
+    },
+    home: {
+      title: 'Full-Stack Developer',
+      subtitle: 'Building exceptional digital experiences across Android, Web, and beyond',
+      cta: 'Explore My Work',
+    },
+    projects: {
+      viewAll: 'View All Projects',
+      technologies: 'Technologies',
+      liveDemo: 'Live Demo',
+      sourceCode: 'Source Code',
+    },
+  },
+  ar: {
+    nav: {
+      home: 'الرئيسية',
+      android: 'أندرويد',
+      web: 'الويب',
+      forex: 'الفوركس',
+      data: 'تحليل البيانات',
+      design: 'التصميم',
+      contact: 'اتصل بي',
+    },
+    home: {
+      title: 'مطور متكامل',
+      subtitle: 'بناء تجارب رقمية استثنائية عبر أندرويد والويب وما بعدها',
+      cta: 'استكشف أعمالي',
+    },
+    projects: {
+      viewAll: 'عرض جميع المشاريع',
+      technologies: 'التقنيات',
+      liveDemo: 'عرض مباشر',
+      sourceCode: 'الكود المصدري',
+    },
+  },
+};
+
+export function t(key: string, lang: Language = 'en'): string {
+  const keys = key.split('.');
+  let value: any = translations[lang];
+
+  for (const k of keys) {
+    value = value?.[k];
+  }
+
+  return value || key;
+}
+```
+
+### useTranslation Hook
+
+```typescript
+// lib/hooks/useTranslation.ts
+import { useRTL } from '@/components/providers/RTLProvider';
+import { t as translate } from '@/lib/i18n/translations';
+
+export function useTranslation() {
+  const { language } = useRTL();
+
+  const t = (key: string) => translate(key, language);
+
+  return { t, language };
+}
+```
+
+### Usage in Components
+
+```tsx
+// components/nav/Navigation.tsx
+import { useTranslation } from '@/lib/hooks/useTranslation';
+
+export function Navigation() {
+  const { t } = useTranslation();
+
+  return (
+    <nav>
+      <a href="/">{t('nav.home')}</a>
+      <a href="/android">{t('nav.android')}</a>
+      <a href="/web">{t('nav.web')}</a>
+      <a href="/contact">{t('nav.contact')}</a>
+    </nav>
+  );
+}
+```
+
+---
+
+## 9.4 Cultural Adaptations
+
+### Color Psychology for MENA
+
+```typescript
+// lib/themes/mena-colors.ts
+export const menaColorAdaptations = {
+  // Green is highly positive (Islam, nature, prosperity)
+  primary: '#00A86B',  // Jade green instead of neon green
+
+  // Gold represents luxury and premium (Gulf markets)
+  accent: '#D4AF37',   // Metallic gold
+
+  // Avoid:
+  // - Blue/white together (Israeli flag association)
+  // - Excessive red (can signal danger/warning)
+};
+```
+
+### Date & Time Formatting
+
+```typescript
+// lib/i18n/formatters.ts
+export function formatDate(date: Date, lang: Language): string {
+  const options: Intl.DateTimeFormatOptions = {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  };
+
+  if (lang === 'ar') {
+    // Use Arabic numerals and Islamic calendar option
+    return new Intl.DateTimeFormat('ar-SA', {
+      ...options,
+      calendar: 'gregory',  // or 'islamic' for Hijri
+      numberingSystem: 'arab',  // ١٢٣ instead of 123
+    }).format(date);
+  }
+
+  return new Intl.DateTimeFormat('en-US', options).format(date);
+}
+```
+
+### Number Formatting
+
+```typescript
+export function formatNumber(num: number, lang: Language): string {
+  if (lang === 'ar') {
+    return new Intl.NumberFormat('ar-SA', {
+      numberingSystem: 'arab',  // Use Arabic-Indic numerals
+    }).format(num);
+  }
+
+  return new Intl.NumberFormat('en-US').format(num);
+}
+```
+
+---
+
+# Chapter 10: 🗓️ 8-Week Implementation Roadmap
+
+This chapter provides a day-by-day implementation plan to build The Prism Portfolio from scratch.
+
+---
+
+## Week 1: Foundation & Core Setup
+
+### Day 1-2: Project Initialization
+
+**Goals**: Set up Next.js 15 project with TypeScript, Tailwind, and essential dependencies.
+
+```bash
+# Day 1 Morning: Create project
+npx create-next-app@latest pigo-portfolio --typescript --tailwind --app
+cd pigo-portfolio
+
+# Install core dependencies
+npm install framer-motion zustand
+npm install @types/node @types/react @types/react-dom
+
+# Install development tools
+npm install -D eslint prettier eslint-config-prettier
+npm install -D @typescript-eslint/eslint-plugin @typescript-eslint/parser
+
+# Day 1 Afternoon: Configure Tailwind
+# Edit tailwind.config.js (add custom colors, fonts, animations)
+
+# Day 2: Set up folder structure
+mkdir -p app/{(careers)/{android,web,forex,data,design},projects/[slug]}
+mkdir -p components/{adaptive,cards,chat,interactions,providers}
+mkdir -p lib/{themes,hooks,store,data,animations,performance,i18n}
+```
+
+**Deliverables**:
+- ✅ Next.js 15 project running
+- ✅ Tailwind configured with custom theme
+- ✅ Folder structure complete
+- ✅ Git repository initialized
+
+---
+
+### Day 3-4: Theme System
+
+**Goals**: Implement theme architecture with Zustand store and ThemeProvider.
+
+**Day 3**:
+```typescript
+// 1. Create theme interface (lib/themes/index.ts)
+// 2. Create Android theme (lib/themes/android.ts)
+// 3. Create Web theme (lib/themes/web.ts)
+// 4. Create Zustand store (lib/store/theme.ts)
+```
+
+**Day 4**:
+```tsx
+// 1. Build ThemeProvider component
+// 2. Create useCareerTheme hook
+// 3. Test CSS variable injection
+// 4. Verify theme switching works
+```
+
+**Deliverables**:
+- ✅ 2 complete themes (Android, Web)
+- ✅ Theme switching functional
+- ✅ CSS variables injecting correctly
+
+---
+
+### Day 5-7: Layout & Navigation
+
+**Day 5**:
+```tsx
+// 1. Build root layout (app/layout.tsx)
+// 2. Set up fonts (Google Fonts: Inter, Roboto, JetBrains Mono)
+// 3. Create metadata and SEO config
+```
+
+**Day 6**:
+```tsx
+// 1. Build careers layout (app/(careers)/layout.tsx)
+// 2. Integrate ThemeProvider
+// 3. Test route groups working
+```
+
+**Day 7**:
+```tsx
+// 1. Build AdaptiveNav component
+// 2. Implement bottom bar (Android)
+// 3. Implement sticky header (Web)
+// 4. Add mobile responsiveness
+```
+
+**Deliverables**:
+- ✅ Layouts complete
+- ✅ Adaptive navigation working
+- ✅ Mobile responsive
+
+---
+
+## Week 2: Domain Pages (Android & Web)
+
+### Day 8-10: Android Page
+
+**Day 8**:
+```tsx
+// 1. Create Android skills array
+// 2. Build hero section with Framer Motion animations
+// 3. Add Material Design color scheme
+```
+
+**Day 9**:
+```tsx
+// 1. Build ProjectCard component
+// 2. Create projects data file (lib/data/projects.ts)
+// 3. Add 2-3 sample Android projects
+// 4. Display projects grid
+```
+
+**Day 10**:
+```tsx
+// 1. Add floating action button (FAB)
+// 2. Implement skills showcase section
+// 3. Polish animations and spacing
+```
+
+**Deliverables**:
+- ✅ Android page complete with projects
+- ✅ Material Design theme applied
+- ✅ Smooth animations
+
+---
+
+### Day 11-14: Web Page & Background Patterns
+
+**Day 11-12**:
+```tsx
+// Build Web page similar structure to Android
+// Add glassmorphism styles
+// Create web-specific projects
+```
+
+**Day 13**:
+```tsx
+// 1. Build BackgroundPattern component
+// 2. Implement hexagon grid (Android)
+// 3. Implement grid lines (Web)
+```
+
+**Day 14**:
+```tsx
+// 1. Optimize canvas performance
+// 2. Add particle network for home page
+// 3. Test on low-end devices
+```
+
+**Deliverables**:
+- ✅ Web page complete
+- ✅ All 3 background patterns working
+- ✅ 60fps performance
+
+---
+
+## Week 3: Remaining Domains & Home Page
+
+### Day 15-17: Forex, Data Analysis, Design Pages
+
+**Day 15**: Forex Trading page
+```tsx
+// 1. Terminal color scheme
+// 2. Ticker navigation
+// 3. Trading calculator component
+```
+
+**Day 16**: Data Analysis page
+```tsx
+// 1. Notebook aesthetic
+// 2. Cell-based navigation
+// 3. CSV analyzer component
+```
+
+**Day 17**: Design page
+```tsx
+// 1. Figma-inspired UI
+// 2. Tool sidebar navigation
+// 3. Component library playground
+```
+
+**Deliverables**:
+- ✅ All 5 domain pages complete
+- ✅ Signature features implemented
+- ✅ Consistent navigation patterns
+
+---
+
+### Day 18-21: Home Page & Prism Transitions
+
+**Day 18-19**: Home page
+```tsx
+// 1. Morphing text animation
+// 2. Domain cards with hover effects
+// 3. Quick stats section
+// 4. Particle background
+```
+
+**Day 20-21**: Prism transitions
+```tsx
+// 1. Implement View Transitions API
+// 2. Add spectrum dispersion effect
+// 3. Test transition physics
+// 4. Add sound effects (optional)
+```
+
+**Deliverables**:
+- ✅ Home page complete
+- ✅ Prism transitions working
+- ✅ Smooth domain switching
+
+---
+
+## Week 4: Project Pages & Timeline
+
+### Day 22-24: Dynamic Project Pages
+
+**Day 22**:
+```tsx
+// 1. Create [slug]/page.tsx
+// 2. Implement getProjectBySlug
+// 3. Build project detail layout
+```
+
+**Day 23**:
+```tsx
+// 1. Add image galleries
+// 2. Display impact metrics
+// 3. Show lessons learned
+// 4. Add GitHub/live links
+```
+
+**Day 24**:
+```tsx
+// 1. Add related projects section
+// 2. Implement breadcrumb navigation
+// 3. Polish animations
+```
+
+**Deliverables**:
+- ✅ Project pages fully functional
+- ✅ All project data displaying
+- ✅ Smooth transitions
+
+---
+
+### Day 25-28: Career Timeline Sequencer
+
+**Day 25-26**: Data structure
+```typescript
+// 1. Create timeline data type
+// 2. Add all career entries
+// 3. Include overlapping jobs
+```
+
+**Day 27-28**: Visualization
+```tsx
+// 1. Build multi-track timeline component
+// 2. Add zoom controls
+// 3. Implement track highlighting
+// 4. Add timeline filters
+```
+
+**Deliverables**:
+- ✅ Timeline component complete
+- ✅ All career data visible
+- ✅ Interactive controls working
+
+---
+
+## Week 5: Advanced Features
+
+### Day 29-31: Custom Cursors
+
+**Day 29**:
+```tsx
+// 1. Build AdaptiveCursor component
+// 2. Implement ripple effect (Android)
+```
+
+**Day 30**:
+```tsx
+// 1. Implement crosshair (Web)
+// 2. Add other cursor styles
+```
+
+**Day 31**:
+```tsx
+// 1. Optimize cursor performance
+// 2. Hide on touch devices
+// 3. Test cross-browser
+```
+
+**Deliverables**:
+- ✅ All cursor styles working
+- ✅ Smooth 60fps tracking
+- ✅ Mobile-friendly
+
+---
+
+### Day 32-35: AI Chatbot with RAG
+
+**Day 32**: Setup
+```bash
+# 1. Create Supabase account
+# 2. Set up pgvector extension
+# 3. Create embeddings table
+```
+
+**Day 33**: Data preparation
+```typescript
+// 1. Write embedding generation script
+// 2. Generate embeddings for all projects
+// 3. Store in Supabase
+```
+
+**Day 34**: API route
+```typescript
+// 1. Build /api/chat endpoint
+// 2. Implement RAG retrieval
+// 3. Stream GPT-4 responses
+```
+
+**Day 35**: Frontend
+```tsx
+// 1. Build chat UI component
+// 2. Add floating action button
+// 3. Test conversations
+```
+
+**Deliverables**:
+- ✅ AI chatbot fully functional
+- ✅ Accurate context retrieval
+- ✅ Smooth streaming responses
+
+---
+
+## Week 6: Performance & Optimization
+
+### Day 36-38: Device-Context Optimization
+
+**Day 36**:
+```typescript
+// 1. Build device detection system
+// 2. Create feature matrix
+// 3. Test FPS measurement
+```
+
+**Day 37**:
+```tsx
+// 1. Build PerformanceProvider
+// 2. Create adaptive components
+// 3. Test on different devices
+```
+
+**Day 38**:
+```typescript
+// 1. Implement network detection
+// 2. Add prefetch strategies
+// 3. Optimize bundle size
+```
+
+**Deliverables**:
+- ✅ Device tiers detecting correctly
+- ✅ Features adapting appropriately
+- ✅ Low-end devices performing well
+
+---
+
+### Day 39-42: Image Optimization & Analytics
+
+**Day 39-40**: Images
+```bash
+# 1. Convert all images to AVIF/WebP
+# 2. Generate blur placeholders
+# 3. Implement lazy loading
+# 4. Add responsive srcsets
+```
+
+**Day 41-42**: Analytics
+```typescript
+// 1. Set up Vercel Analytics
+// 2. Implement custom event tracking
+// 3. Add performance monitoring
+// 4. Set up error logging (Sentry)
+```
+
+**Deliverables**:
+- ✅ All images optimized
+- ✅ Analytics tracking correctly
+- ✅ Performance metrics visible
+
+---
+
+## Week 7: UX Polish & Internationalization
+
+### Day 43-45: Micro-Interactions & Gamification
+
+**Day 43**:
+```tsx
+// 1. Add success confetti
+// 2. Implement scroll milestones
+// 3. Create progress indicators
+```
+
+**Day 44**:
+```tsx
+// 1. Build achievement system
+// 2. Add Konami code easter egg
+// 3. Create toast notifications
+```
+
+**Day 45**:
+```tsx
+// 1. Polish all animations
+// 2. Add loading states
+// 3. Improve error messages
+```
+
+**Deliverables**:
+- ✅ Delightful micro-interactions
+- ✅ Gamification elements working
+- ✅ Polished user experience
+
+---
+
+### Day 46-49: RTL & Arabic Support
+
+**Day 46**:
+```tsx
+// 1. Build RTLProvider
+// 2. Add language detection
+// 3. Test direction switching
+```
+
+**Day 47**:
+```css
+// 1. Add RTL-aware CSS
+// 2. Install Arabic fonts
+// 3. Test typography
+```
+
+**Day 48-49**:
+```typescript
+// 1. Create translation system
+// 2. Translate all text to Arabic
+// 3. Test full RTL experience
+```
+
+**Deliverables**:
+- ✅ Full RTL support
+- ✅ Arabic translations complete
+- ✅ MENA-optimized design
+
+---
+
+## Week 8: Testing, SEO & Launch
+
+### Day 50-52: Cross-Browser Testing
+
+**Day 50**: Desktop browsers
+```
+Test on:
+- Chrome/Edge (Chromium)
+- Firefox
+- Safari
+```
+
+**Day 51**: Mobile devices
+```
+Test on:
+- iOS Safari
+- Android Chrome
+- Samsung Internet
+```
+
+**Day 52**: Fix bugs
+```
+- Resolve browser-specific issues
+- Fix mobile layout problems
+- Polish animations
+```
+
+**Deliverables**:
+- ✅ Works on all major browsers
+- ✅ Mobile experience polished
+- ✅ No critical bugs
+
+---
+
+### Day 53-54: SEO & Accessibility
+
+**Day 53**: SEO
+```tsx
+// 1. Add metadata to all pages
+// 2. Create sitemap.xml
+// 3. Add robots.txt
+// 4. Implement Open Graph tags
+// 5. Test with Lighthouse
+```
+
+**Day 54**: Accessibility
+```tsx
+// 1. Add ARIA labels
+// 2. Test keyboard navigation
+// 3. Check color contrast (WCAG AAA)
+// 4. Test with screen reader
+// 5. Fix accessibility issues
+```
+
+**Deliverables**:
+- ✅ Lighthouse score > 95
+- ✅ WCAG AAA compliant
+- ✅ SEO optimized
+
+---
+
+### Day 55-56: Deployment & Launch
+
+**Day 55**: Deploy to Vercel
+```bash
+# 1. Connect GitHub repository
+# 2. Configure environment variables
+# 3. Deploy to production
+# 4. Test production build
+# 5. Set up custom domain
+```
+
+**Day 56**: Final polish
+```
+- Test all features in production
+- Monitor performance metrics
+- Fix any production issues
+- Celebrate launch! 🎉
+```
+
+**Final Deliverables**:
+- ✅ Live portfolio deployed
+- ✅ All features working
+- ✅ Ready to share with the world
+
+---
+
+## Post-Launch: Continuous Improvement
+
+**Week 9+**: Monitor and iterate
+- Analyze user behavior with analytics
+- Collect feedback from visitors
+- Fix bugs and add improvements
+- Keep content updated with new projects
+- Experiment with new features
+
+---
+
+## Dependencies Checklist
+
+```json
+{
+  "dependencies": {
+    "next": "^15.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "framer-motion": "^11.5.0",
+    "zustand": "^4.5.0",
+    "@supabase/supabase-js": "^2.39.0",
+    "openai": "^4.20.0",
+    "ai": "^3.0.0",
+    "canvas-confetti": "^1.9.0",
+    "react-hot-toast": "^2.4.1",
+    "@react-three/fiber": "^8.15.0",
+    "@react-three/drei": "^9.92.0",
+    "three": "^0.160.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.0",
+    "@types/node": "^20.10.0",
+    "@types/react": "^18.2.0",
+    "@types/three": "^0.160.0",
+    "tailwindcss": "^3.4.0",
+    "postcss": "^8.4.0",
+    "autoprefixer": "^10.4.0",
+    "eslint": "^8.56.0",
+    "prettier": "^3.1.0",
+    "tailwindcss-rtl": "^0.9.0"
+  }
+}
+```
+
+---
+
+## Success Metrics
+
+At the end of 8 weeks, you should have:
+
+- ✅ **5 Complete Domain Pages** with unique themes and interactions
+- ✅ **Dynamic Project System** with 10+ project entries
+- ✅ **Career Timeline Sequencer** visualizing your full career
+- ✅ **AI Chatbot** answering questions about your work
+- ✅ **Prism Refraction Transitions** between domains
+- ✅ **Custom Cursors** for each theme
+- ✅ **Canvas Backgrounds** (3 types: hexagons, grid, particles)
+- ✅ **Device-Optimized Performance** (high/medium/low tiers)
+- ✅ **Full RTL Support** with Arabic translations
+- ✅ **Lighthouse Score > 95** (Performance, Accessibility, SEO)
+- ✅ **Responsive Design** (mobile, tablet, desktop)
+- ✅ **Deployed to Production** on Vercel with custom domain
+
+---
+
+## Emergency Shortcuts (if timeline is tight)
+
+**Can skip without breaking core experience**:
+- 3D Android Robot (use static image instead)
+- Sound effects for transitions
+- Advanced gamification (achievements)
+- Arabic translations (launch English-only first)
+- AI chatbot RAG (use simple FAQ instead)
+
+**Must keep**:
+- Theme system and domain pages
+- Project pages
+- Adaptive navigation
+- Prism transitions (can simplify to fade)
+- Performance optimization
+
+---
+
+# 🎉 Conclusion: Your Revolutionary Portfolio Awaits
+
+You now have **complete, production-ready specifications** for The Prism Portfolio:
+
+## What You've Built
+
+1. **🎨 5 Unique Domain Experiences**
+   - Android (Material Design 3)
+   - Web (Neo-Brutalist Glassmorphism)
+   - Forex (Financial Terminal)
+   - Data Analysis (Interactive Notebook)
+   - UI/UX Design (Figma Playground)
+
+2. **🚀 Signature Features**
+   - Prism Refraction Transitions (View Transitions API)
+   - AI Chatbot with RAG (GPT-4 + Supabase pgvector)
+   - Device-Context Optimization (High/Medium/Low tiers)
+
+3. **🧠 UX Psychology**
+   - Audience Detection (Recruiter/Client/Developer)
+   - Dopamine Design (Ethical engagement)
+   - INTP-T Optimization (Deep exploration)
+
+4. **🌍 Global Accessibility**
+   - Full RTL support
+   - Arabic typography
+   - Cultural adaptations for MENA
+
+5. **📅 8-Week Roadmap**
+   - Day-by-day implementation plan
+   - Complete dependency list
+   - Success metrics
+
+---
+
+## Tech Stack Summary
+
+```
+Frontend:      Next.js 15, React 19, TypeScript
+Styling:       TailwindCSS 3.4, CSS Variables
+Animation:     Framer Motion 11, View Transitions API, GSAP
+3D:            Three.js, React Three Fiber
+State:         Zustand 4.5
+Backend:       Next.js API Routes, Supabase
+AI:            OpenAI GPT-4, RAG with pgvector
+Performance:   Device detection, AVIF images, lazy loading
+i18n:          RTL support, Arabic fonts, translations
+Analytics:     Vercel Analytics, Custom events
+```
+
+---
+
+## What Makes This Revolutionary
+
+✨ **Never Been Done Before**:
+- Prism refraction metaphor for career visualization
+- Multi-track timeline sequencer for overlapping jobs
+- Domain-specific UI transformations (not just color changes)
+- AI chatbot with RAG for portfolio context
+- Device-tier optimization matrix
+
+🎯 **Follows ALL 2025 Trends**:
+- View Transitions API (Baseline October 2025)
+- React 19 Server Components & Compiler
+- Next.js 15 Turbopack
+- Scroll-driven Animations (CSS-only)
+- AVIF images (60% smaller)
+- GSAP 3.12+ (all plugins free)
+- Dopamine design principles
+- MENA market optimization
+
+💎 **Production-Ready**:
+- Complete TypeScript interfaces
+- Detailed component implementations
+- Performance optimization strategies
+- Accessibility (WCAG AAA)
+- SEO best practices
+- Cross-browser compatibility
+
+---
+
+## Next Steps
+
+1. **Start Week 1** following the 8-week roadmap
+2. **Build incrementally** - don't try to do everything at once
+3. **Test frequently** - verify each feature before moving on
+4. **Get feedback** - share work-in-progress with friends/colleagues
+5. **Iterate** - refine based on user behavior after launch
+
+---
+
+## Final Words
+
+The Prism Portfolio is designed to be:
+- **Memorable** - Visitors will remember the refraction metaphor
+- **Interactive** - Every page invites exploration
+- **Fast** - Optimized for all devices and networks
+- **Accessible** - Works for everyone, everywhere
+- **Scalable** - Easy to add new domains and projects
+
+This isn't just a portfolio. It's a **statement of your multifaceted expertise**, a **showcase of cutting-edge web development**, and a **conversation starter** that will make you unforgettable.
+
+**Now go build it. The prism is ready to refract your light. 🌈**
+
+---
+
+*THE PRISM PORTFOLIO BLUEPRINT - Complete Edition*
+*Total Length: 6,800+ lines of production-ready specifications*
+*Created: 2025-11-18*
+*Ready to revolutionize portfolios in 2025 and beyond.*
 
