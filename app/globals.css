@@ -155,6 +155,72 @@
 
 /* Focus visible for accessibility */
 :focus-visible {
-  @apply outline-2 outline-offset-2 outline-white/50;
+  @apply outline-2 outline-offset-2 outline-white/50 rounded;
+}
+
+/* Screen reader only text */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Show on focus for screen reader only elements */
+.sr-only:focus,
+.sr-only:active {
+  position: static;
+  width: auto;
+  height: auto;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
+/* Skip link specific focus styles */
+.focus\:not-sr-only:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
+/* Accessible link styles */
+a:focus-visible {
+  @apply outline-2 outline-offset-2;
+}
+
+/* Button accessibility - ensure minimum touch target size */
+button,
+[role="button"] {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --theme-primary: 61 255 132;
+    --theme-secondary: 138 43 226;
+  }
+
+  .text-gradient-android,
+  .text-gradient-web,
+  .text-gradient-forex,
+  .text-gradient-data,
+  .text-gradient-design {
+    background: none;
+    -webkit-background-clip: unset;
+    background-clip: unset;
+    -webkit-text-fill-color: unset;
+    color: rgb(var(--theme-primary));
+  }
 }
 
