@@ -2404,13 +2404,2148 @@ export function LiveCodeEditor() {
 
 ### 🟡 Domain 3: Forex Trading - "Financial Terminal Aesthetic"
 
-**(Continuing with Forex, Data Analysis, and Design domains... Would you like me to continue with these sections, or shall I proceed to the remaining chapters: Signature Features, UX Psychology, MENA Optimization, 8-Week Roadmap, etc.?)**
+#### **Design Philosophy**
 
-Let me know if you'd like me to:
-1. **Continue with remaining domains** (Forex, Data, Design - full specs)
-2. **Jump to Signature Features** (AI chatbot, Prism transitions, device optimization)
-3. **Move to Implementation Roadmap** (8-week plan with daily breakdown)
-4. **Add all sections** (comprehensive document - will be very long)
+**Inspired by**: Bloomberg Terminal, TradingView, Robinhood, Interactive Brokers
 
-Which direction would you prefer?
+**Core Principles:**
+1. **Data Density**: Maximum information, minimal noise
+2. **Professional Terminal**: Dark mode, monospace, precision
+3. **Real-Time Feel**: Live updates, ticker animations, dynamic charts
+4. **Trust Through Numbers**: Data-driven credibility, proven strategies
+
+---
+
+#### **Color System**
+
+```css
+/* Terminal Palette */
+--forex-primary: #FFD700;           /* Gold (wealth) */
+--forex-primary-rgb: 255, 215, 0;
+
+--forex-bull: #26A69A;              /* Teal (positive/buy) */
+--forex-bull-rgb: 38, 166, 154;
+
+--forex-bear: #EF5350;              /* Red (negative/sell) */
+--forex-bear-rgb: 239, 83, 80;
+
+/* Surface Colors (Terminal Dark) */
+--forex-surface: #0A1929;           /* Deep navy */
+--forex-surface-elevated: #132F4C;
+--forex-panel: #1A2332;
+--forex-on-surface: #E3F2FD;
+
+/* Chart Colors */
+--forex-grid: rgba(255, 255, 255, 0.05);
+--forex-axis: rgba(255, 255, 255, 0.3);
+--forex-candle-up: #26A69A;
+--forex-candle-down: #EF5350;
+
+/* Status Indicators */
+--forex-profit: #4CAF50;
+--forex-loss: #F44336;
+--forex-neutral: #9E9E9E;
+
+/* Accent (Analytics) */
+--forex-accent-blue: #2196F3;       /* Charts */
+--forex-accent-orange: #FF9800;     /* Highlights */
+```
+
+**Color Usage Psychology:**
+
+| Element | Color | Reasoning |
+|---------|-------|-----------|
+| Primary actions | Gold (#FFD700) | Wealth, premium, attention |
+| Buy signals | Teal (#26A69A) | Positive association, calm confidence |
+| Sell signals | Red (#EF5350) | Alert, stop, caution |
+| Background | Deep Navy (#0A1929) | Reduces eye strain, professional |
+| Text | Light Blue (#E3F2FD) | High contrast on dark, easy reading |
+
+---
+
+#### **Typography**
+
+```css
+/* Font Stack (Terminal/Trading) */
+--font-heading-forex: 'IBM Plex Mono', 'Roboto Mono', monospace;
+--font-body-forex: 'IBM Plex Sans', 'Inter', system-ui;
+--font-mono-forex: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+
+/* Type Scale (Precise, tabular) */
+--text-ticker: clamp(1.5rem, 2vw, 2rem);        /* Live prices */
+--text-data: clamp(0.875rem, 1vw, 1rem);        /* Data points */
+--text-label: clamp(0.75rem, 0.85vw, 0.875rem); /* Field labels */
+
+/* Tabular Numerals (CRITICAL for financial data) */
+font-variant-numeric: tabular-nums slashed-zero;
+
+/* Font Weights */
+--font-weight-regular: 400;
+--font-weight-medium: 500;
+--font-weight-bold: 700;
+
+/* Letter Spacing (Monospace alignment) */
+--letter-spacing-mono: 0.05em;
+```
+
+---
+
+#### **Layout: Terminal Grid System**
+
+```css
+/* Grid-based terminal layout */
+.terminal-layout {
+  display: grid;
+  grid-template-columns: 250px 1fr 320px; /* Sidebar | Main | Stats */
+  grid-template-rows: 60px 1fr 200px;     /* Ticker | Chart | Orders */
+  gap: 2px;
+  background: var(--forex-surface);
+  height: 100vh;
+}
+
+/* Panel Styling */
+.terminal-panel {
+  background: var(--forex-panel);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1rem;
+  overflow: auto;
+}
+
+/* Data Table */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono-forex);
+  font-size: 0.875rem;
+}
+
+.data-table th {
+  text-align: left;
+  padding: 0.5rem;
+  border-bottom: 1px solid var(--forex-grid);
+  font-weight: 600;
+  color: var(--forex-accent-orange);
+}
+
+.data-table td {
+  padding: 0.5rem;
+  border-bottom: 1px solid var(--forex-grid);
+  font-variant-numeric: tabular-nums;
+}
+```
+
+---
+
+#### **Navigation: Top Ticker Bar**
+
+**Desktop:**
+```
+┌─────────────────────────────────────────────────────────────────┐
+│ EUR/USD 1.0856 ▲ | GBP/USD 1.2734 ▼ | USD/JPY 149.82 ▲ | ...  │ ← Scrolling ticker
+├─────────────────────────────────────────────────────────────────┤
+│  SIDEBAR  │         CHART AREA          │    STATISTICS        │
+│  Pairs    │                             │    Win Rate: 67%     │
+│  ───────  │                             │    ROI: +142%        │
+│  EUR/USD  │                             │    Trades: 324       │
+│  GBP/USD  │                             │                      │
+```
+
+**Implementation:**
+
+```tsx
+// components/adaptive/AdaptiveNav.tsx (Forex variant)
+'use client';
+
+import { motion, useAnimationFrame } from 'framer-motion';
+import { useState, useRef } from 'react';
+
+interface CurrencyPair {
+  pair: string;
+  price: number;
+  change: number;
+  percentChange: number;
+}
+
+const CURRENCY_PAIRS: CurrencyPair[] = [
+  { pair: 'EUR/USD', price: 1.0856, change: 0.0023, percentChange: 0.21 },
+  { pair: 'GBP/USD', price: 1.2734, change: -0.0012, percentChange: -0.09 },
+  { pair: 'USD/JPY', price: 149.82, change: 0.54, percentChange: 0.36 },
+  { pair: 'USD/CHF', price: 0.8934, change: 0.0008, percentChange: 0.09 },
+  { pair: 'AUD/USD', price: 0.6521, change: -0.0034, percentChange: -0.52 },
+  { pair: 'USD/CAD', price: 1.3789, change: 0.0015, percentChange: 0.11 },
+];
+
+export function ForexNavigation() {
+  const [offset, setOffset] = useState(0);
+  const tickerRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll ticker
+  useAnimationFrame((t, delta) => {
+    setOffset((prev) => (prev - 0.5) % (CURRENCY_PAIRS.length * 200));
+  });
+
+  return (
+    <>
+      {/* Scrolling Ticker */}
+      <div className="fixed top-0 left-0 right-0 z-50 h-14 overflow-hidden bg-[var(--forex-surface)] border-b border-white/10">
+        <motion.div
+          ref={tickerRef}
+          className="flex items-center h-full whitespace-nowrap"
+          style={{ x: offset }}
+        >
+          {/* Render pairs twice for seamless loop */}
+          {[...CURRENCY_PAIRS, ...CURRENCY_PAIRS].map((pair, index) => (
+            <div
+              key={`${pair.pair}-${index}`}
+              className="inline-flex items-center gap-2 px-6 border-r border-white/10"
+            >
+              <span className="font-mono font-semibold text-sm" style={{ color: 'var(--forex-primary)' }}>
+                {pair.pair}
+              </span>
+              <span className="font-mono text-base" style={{ color: 'var(--forex-on-surface)' }}>
+                {pair.price.toFixed(4)}
+              </span>
+              <span
+                className="font-mono text-xs font-bold"
+                style={{
+                  color: pair.change >= 0 ? 'var(--forex-bull)' : 'var(--forex-bear)',
+                }}
+              >
+                {pair.change >= 0 ? '▲' : '▼'} {Math.abs(pair.percentChange).toFixed(2)}%
+              </span>
+            </div>
+          ))}
+        </motion.div>
+      </div>
+
+      {/* Secondary Navigation */}
+      <div className="fixed top-14 left-0 right-0 z-40 h-12 bg-[var(--forex-panel)] border-b border-white/10 flex items-center px-6 gap-6">
+        {['Dashboard', 'Strategies', 'Analysis', 'Performance'].map((item) => (
+          <button
+            key={item}
+            className="text-sm font-medium opacity-70 hover:opacity-100 transition-opacity"
+            style={{ color: 'var(--forex-on-surface)' }}
+          >
+            {item}
+          </button>
+        ))}
+      </div>
+    </>
+  );
+}
+```
+
+---
+
+#### **Cursor: Crosshair with Price Levels**
+
+```tsx
+// components/adaptive/AdaptiveCursor.tsx (Forex variant)
+'use client';
+
+import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+
+export function ForexCursor() {
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [isOverChart, setIsOverChart] = useState(false);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      setPosition({ x: e.clientX, y: e.clientY });
+
+      // Detect if over chart area
+      const element = document.elementFromPoint(e.clientX, e.clientY);
+      setIsOverChart(element?.closest('.forex-chart') !== null);
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
+  if (!isOverChart) return null;
+
+  return (
+    <>
+      {/* Vertical crosshair */}
+      <div
+        className="fixed top-0 bottom-0 w-px pointer-events-none z-[9999]"
+        style={{
+          left: position.x,
+          backgroundColor: 'var(--forex-accent-orange)',
+          opacity: 0.5,
+        }}
+      />
+
+      {/* Horizontal crosshair */}
+      <div
+        className="fixed left-0 right-0 h-px pointer-events-none z-[9999]"
+        style={{
+          top: position.y,
+          backgroundColor: 'var(--forex-accent-orange)',
+          opacity: 0.5,
+        }}
+      />
+
+      {/* Price label */}
+      <motion.div
+        className="fixed right-4 px-3 py-1 rounded text-xs font-mono font-bold pointer-events-none z-[9999]"
+        style={{
+          top: position.y - 12,
+          backgroundColor: 'var(--forex-accent-orange)',
+          color: 'black',
+        }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+      >
+        1.0856
+      </motion.div>
+
+      {/* Time label */}
+      <motion.div
+        className="fixed bottom-4 px-3 py-1 rounded text-xs font-mono font-bold pointer-events-none z-[9999]"
+        style={{
+          left: position.x - 40,
+          backgroundColor: 'var(--forex-accent-orange)',
+          color: 'black',
+        }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+      >
+        14:32
+      </motion.div>
+    </>
+  );
+}
+```
+
+---
+
+#### **Background Pattern: Animated Candlestick Chart**
+
+```tsx
+// components/adaptive/BackgroundPattern.tsx (Forex variant)
+'use client';
+
+import { useEffect, useRef } from 'react';
+
+interface Candle {
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+}
+
+export function ForexCandlestickPattern() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let animationId: number;
+
+    // Generate random candlestick data
+    const generateCandles = (count: number): Candle[] => {
+      const candles: Candle[] = [];
+      let basePrice = 100;
+
+      for (let i = 0; i < count; i++) {
+        const open = basePrice + (Math.random() - 0.5) * 2;
+        const close = open + (Math.random() - 0.5) * 3;
+        const high = Math.max(open, close) + Math.random() * 1;
+        const low = Math.min(open, close) - Math.random() * 1;
+
+        candles.push({ open, high, low, close });
+        basePrice = close;
+      }
+
+      return candles;
+    };
+
+    const candles = generateCandles(50);
+    let offset = 0;
+
+    const resize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+
+    const drawCandle = (x: number, candle: Candle, candleWidth: number) => {
+      const bullish = candle.close > candle.open;
+      const color = bullish ? 'rgba(38, 166, 154, 0.15)' : 'rgba(239, 83, 80, 0.15)';
+
+      // Scale to canvas height
+      const scale = canvas.height / 200;
+      const baseY = canvas.height / 2;
+
+      const openY = baseY - candle.open * scale;
+      const closeY = baseY - candle.close * scale;
+      const highY = baseY - candle.high * scale;
+      const lowY = baseY - candle.low * scale;
+
+      // Draw wick (high-low line)
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(x + candleWidth / 2, highY);
+      ctx.lineTo(x + candleWidth / 2, lowY);
+      ctx.stroke();
+
+      // Draw body (open-close rectangle)
+      ctx.fillStyle = color;
+      const bodyHeight = Math.abs(closeY - openY);
+      const bodyY = Math.min(openY, closeY);
+      ctx.fillRect(x, bodyY, candleWidth - 2, bodyHeight || 1);
+    };
+
+    const draw = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const candleWidth = canvas.width / 50;
+
+      candles.forEach((candle, index) => {
+        const x = (index * candleWidth - offset) % canvas.width;
+        if (x > -candleWidth && x < canvas.width) {
+          drawCandle(x, candle, candleWidth);
+        }
+      });
+
+      // Slow drift animation
+      offset = (offset + 0.2) % (candles.length * candleWidth);
+
+      animationId = requestAnimationFrame(draw);
+    };
+
+    resize();
+    draw();
+    window.addEventListener('resize', resize);
+
+    return () => {
+      window.removeEventListener('resize', resize);
+      cancelAnimationFrame(animationId);
+    };
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="fixed inset-0 -z-10 pointer-events-none"
+      style={{ opacity: 0.3 }}
+    />
+  );
+}
+```
+
+---
+
+#### **Card Style: Terminal Data Panels**
+
+```tsx
+// components/cards/ForexStrategyCard.tsx
+'use client';
+
+import { motion } from 'framer-motion';
+
+interface StrategyCardProps {
+  strategyName: string;
+  winRate: number;
+  roi: number;
+  totalTrades: number;
+  avgProfit: number;
+  description: string;
+}
+
+export function ForexStrategyCard({
+  strategyName,
+  winRate,
+  roi,
+  totalTrades,
+  avgProfit,
+  description,
+}: StrategyCardProps) {
+  const isProfit = roi > 0;
+
+  return (
+    <motion.article
+      className="relative rounded-lg overflow-hidden border font-mono"
+      style={{
+        backgroundColor: 'var(--forex-panel)',
+        borderColor: 'rgba(255, 255, 255, 0.1)',
+      }}
+      whileHover={{
+        borderColor: 'var(--forex-primary)',
+        scale: 1.02,
+      }}
+      transition={{ duration: 0.2 }}
+    >
+      {/* Header */}
+      <div className="px-4 py-3 border-b" style={{ borderColor: 'rgba(255, 255, 255, 0.1)' }}>
+        <h3 className="text-lg font-bold" style={{ color: 'var(--forex-primary)' }}>
+          {strategyName}
+        </h3>
+        <p className="text-xs opacity-70 mt-1" style={{ color: 'var(--forex-on-surface)' }}>
+          {description}
+        </p>
+      </div>
+
+      {/* Metrics Grid */}
+      <div className="grid grid-cols-2 gap-4 p-4">
+        {/* Win Rate */}
+        <div>
+          <div className="text-xs opacity-50 mb-1" style={{ color: 'var(--forex-on-surface)' }}>
+            Win Rate
+          </div>
+          <div
+            className="text-2xl font-bold"
+            style={{
+              color: winRate > 60 ? 'var(--forex-bull)' : 'var(--forex-bear)',
+            }}
+          >
+            {winRate.toFixed(1)}%
+          </div>
+        </div>
+
+        {/* ROI */}
+        <div>
+          <div className="text-xs opacity-50 mb-1" style={{ color: 'var(--forex-on-surface)' }}>
+            ROI
+          </div>
+          <div
+            className="text-2xl font-bold"
+            style={{
+              color: isProfit ? 'var(--forex-profit)' : 'var(--forex-loss)',
+            }}
+          >
+            {isProfit ? '+' : ''}{roi.toFixed(1)}%
+          </div>
+        </div>
+
+        {/* Total Trades */}
+        <div>
+          <div className="text-xs opacity-50 mb-1" style={{ color: 'var(--forex-on-surface)' }}>
+            Total Trades
+          </div>
+          <div className="text-xl font-semibold" style={{ color: 'var(--forex-on-surface)' }}>
+            {totalTrades.toLocaleString()}
+          </div>
+        </div>
+
+        {/* Avg Profit */}
+        <div>
+          <div className="text-xs opacity-50 mb-1" style={{ color: 'var(--forex-on-surface)' }}>
+            Avg Profit
+          </div>
+          <div
+            className="text-xl font-semibold"
+            style={{
+              color: avgProfit > 0 ? 'var(--forex-profit)' : 'var(--forex-loss)',
+            }}
+          >
+            ${avgProfit.toFixed(2)}
+          </div>
+        </div>
+      </div>
+
+      {/* Sparkline Chart (simplified) */}
+      <div className="px-4 pb-4">
+        <svg width="100%" height="40" className="opacity-50">
+          {/* Simplified profit curve */}
+          <polyline
+            fill="none"
+            stroke={isProfit ? 'var(--forex-profit)' : 'var(--forex-loss)'}
+            strokeWidth="2"
+            points="0,30 25,20 50,25 75,15 100,10 125,12 150,8 175,5 200,3"
+          />
+        </svg>
+      </div>
+
+      {/* Status Indicator */}
+      <div
+        className="absolute top-3 right-3 w-2 h-2 rounded-full"
+        style={{
+          backgroundColor: isProfit ? 'var(--forex-profit)' : 'var(--forex-loss)',
+          boxShadow: `0 0 10px ${isProfit ? 'var(--forex-profit)' : 'var(--forex-loss)'}`,
+        }}
+      />
+    </motion.article>
+  );
+}
+```
+
+---
+
+#### **Signature Feature: Live Trading Calculator**
+
+**Concept**: Interactive risk/reward calculator where visitors can input trade parameters and see real-time P&L calculations
+
+```tsx
+// components/domain-specific/ForexCalculator.tsx
+'use client';
+
+import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+
+export function ForexTradingCalculator() {
+  const [entryPrice, setEntryPrice] = useState(1.0850);
+  const [exitPrice, setExitPrice] = useState(1.0900);
+  const [lotSize, setLotSize] = useState(1.0);
+  const [leverage, setLeverage] = useState(100);
+
+  const [pnl, setPnl] = useState(0);
+  const [pnlPercentage, setPnlPercentage] = useState(0);
+  const [requiredMargin, setRequiredMargin] = useState(0);
+
+  useEffect(() => {
+    // Calculate P&L
+    const pipValue = 10; // $10 per pip for 1 standard lot EUR/USD
+    const pipDifference = (exitPrice - entryPrice) * 10000; // Convert to pips
+    const calculatedPnl = pipDifference * pipValue * lotSize;
+
+    // Calculate margin
+    const contractValue = 100000 * lotSize; // 1 lot = 100,000 units
+    const margin = contractValue / leverage;
+
+    // Calculate percentage
+    const percentage = (calculatedPnl / margin) * 100;
+
+    setPnl(calculatedPnl);
+    setPnlPercentage(percentage);
+    setRequiredMargin(margin);
+  }, [entryPrice, exitPrice, lotSize, leverage]);
+
+  return (
+    <div className="max-w-4xl mx-auto p-8 rounded-lg border" style={{
+      backgroundColor: 'var(--forex-panel)',
+      borderColor: 'rgba(255, 255, 255, 0.1)',
+    }}>
+      <h2 className="text-3xl font-bold mb-2" style={{ color: 'var(--forex-primary)' }}>
+        Trade Calculator
+      </h2>
+      <p className="text-sm opacity-70 mb-8" style={{ color: 'var(--forex-on-surface)' }}>
+        Calculate your potential profit/loss based on entry, exit, and position size
+      </p>
+
+      {/* Input Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        {/* Entry Price */}
+        <div>
+          <label className="block text-xs font-mono mb-2 opacity-70" style={{ color: 'var(--forex-on-surface)' }}>
+            Entry Price
+          </label>
+          <input
+            type="number"
+            step="0.0001"
+            value={entryPrice}
+            onChange={(e) => setEntryPrice(parseFloat(e.target.value))}
+            className="w-full px-4 py-3 rounded border font-mono text-lg"
+            style={{
+              backgroundColor: 'var(--forex-surface)',
+              borderColor: 'rgba(255, 255, 255, 0.2)',
+              color: 'var(--forex-on-surface)',
+            }}
+          />
+        </div>
+
+        {/* Exit Price */}
+        <div>
+          <label className="block text-xs font-mono mb-2 opacity-70" style={{ color: 'var(--forex-on-surface)' }}>
+            Exit Price (Target)
+          </label>
+          <input
+            type="number"
+            step="0.0001"
+            value={exitPrice}
+            onChange={(e) => setExitPrice(parseFloat(e.target.value))}
+            className="w-full px-4 py-3 rounded border font-mono text-lg"
+            style={{
+              backgroundColor: 'var(--forex-surface)',
+              borderColor: exitPrice > entryPrice ? 'var(--forex-bull)' : 'var(--forex-bear)',
+              color: 'var(--forex-on-surface)',
+            }}
+          />
+        </div>
+
+        {/* Lot Size */}
+        <div>
+          <label className="block text-xs font-mono mb-2 opacity-70" style={{ color: 'var(--forex-on-surface)' }}>
+            Lot Size
+          </label>
+          <input
+            type="number"
+            step="0.1"
+            value={lotSize}
+            onChange={(e) => setLotSize(parseFloat(e.target.value))}
+            className="w-full px-4 py-3 rounded border font-mono text-lg"
+            style={{
+              backgroundColor: 'var(--forex-surface)',
+              borderColor: 'rgba(255, 255, 255, 0.2)',
+              color: 'var(--forex-on-surface)',
+            }}
+          />
+        </div>
+
+        {/* Leverage */}
+        <div>
+          <label className="block text-xs font-mono mb-2 opacity-70" style={{ color: 'var(--forex-on-surface)' }}>
+            Leverage (1:{leverage})
+          </label>
+          <input
+            type="range"
+            min="1"
+            max="500"
+            value={leverage}
+            onChange={(e) => setLeverage(parseInt(e.target.value))}
+            className="w-full"
+          />
+          <div className="flex justify-between text-xs font-mono mt-1 opacity-50">
+            <span>1:1</span>
+            <span>1:500</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Results Dashboard */}
+      <motion.div
+        className="grid grid-cols-1 md:grid-cols-3 gap-6 p-6 rounded-lg border"
+        style={{
+          backgroundColor: 'var(--forex-surface)',
+          borderColor: pnl >= 0 ? 'var(--forex-profit)' : 'var(--forex-loss)',
+        }}
+        animate={{
+          borderColor: pnl >= 0 ? 'var(--forex-profit)' : 'var(--forex-loss)',
+        }}
+      >
+        {/* P&L in USD */}
+        <div className="text-center">
+          <div className="text-xs font-mono opacity-50 mb-2" style={{ color: 'var(--forex-on-surface)' }}>
+            Profit/Loss
+          </div>
+          <motion.div
+            className="text-4xl font-bold font-mono"
+            style={{
+              color: pnl >= 0 ? 'var(--forex-profit)' : 'var(--forex-loss)',
+            }}
+            key={pnl}
+            initial={{ scale: 1.2 }}
+            animate={{ scale: 1 }}
+            transition={{ type: 'spring', stiffness: 300 }}
+          >
+            {pnl >= 0 ? '+' : ''}${pnl.toFixed(2)}
+          </motion.div>
+        </div>
+
+        {/* P&L Percentage */}
+        <div className="text-center">
+          <div className="text-xs font-mono opacity-50 mb-2" style={{ color: 'var(--forex-on-surface)' }}>
+            Return on Margin
+          </div>
+          <motion.div
+            className="text-4xl font-bold font-mono"
+            style={{
+              color: pnlPercentage >= 0 ? 'var(--forex-profit)' : 'var(--forex-loss)',
+            }}
+            key={pnlPercentage}
+            initial={{ scale: 1.2 }}
+            animate={{ scale: 1 }}
+            transition={{ type: 'spring', stiffness: 300 }}
+          >
+            {pnlPercentage >= 0 ? '+' : ''}{pnlPercentage.toFixed(2)}%
+          </motion.div>
+        </div>
+
+        {/* Required Margin */}
+        <div className="text-center">
+          <div className="text-xs font-mono opacity-50 mb-2" style={{ color: 'var(--forex-on-surface)' }}>
+            Required Margin
+          </div>
+          <div className="text-4xl font-bold font-mono" style={{ color: 'var(--forex-accent-blue)' }}>
+            ${requiredMargin.toFixed(2)}
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Risk Warning */}
+      <div className="mt-6 p-4 rounded border text-xs opacity-70" style={{
+        backgroundColor: 'rgba(239, 83, 80, 0.1)',
+        borderColor: 'var(--forex-bear)',
+        color: 'var(--forex-on-surface)',
+      }}>
+        <strong>Risk Disclaimer:</strong> This calculator is for educational purposes only.
+        Past performance does not guarantee future results. Forex trading involves substantial risk of loss.
+      </div>
+    </div>
+  );
+}
+```
+
+---
+
+### 🟢 Domain 4: Data Analysis - "Interactive Data Playground"
+
+#### **Design Philosophy**
+
+**Inspired by**: Observable, Jupyter Notebooks, Plotly Dash, Tableau
+
+**Core Principles:**
+1. **Data Visualization First**: Charts tell the story
+2. **Interactive Exploration**: Users can manipulate data
+3. **Notebook Aesthetic**: Code + output cells
+4. **Scientific Rigor**: Reproducible, documented analysis
+
+---
+
+#### **Color System**
+
+```css
+/* Data Visualization Palette */
+--data-primary: #FF6B6B;            /* Warm red (attention) */
+--data-primary-rgb: 255, 107, 107;
+
+--data-secondary: #4ECDC4;          /* Teal (data points) */
+--data-secondary-rgb: 78, 205, 196;
+
+--data-accent: #45B7D1;             /* Sky blue (highlights) */
+--data-accent-rgb: 69, 183, 209;
+
+/* Chart Colors (Categorical) */
+--data-color-1: #FF6B6B;
+--data-color-2: #4ECDC4;
+--data-color-3: #FFE66D;
+--data-color-4: #A8E6CF;
+--data-color-5: #FF8B94;
+--data-color-6: #C7CEEA;
+
+/* Surface Colors */
+--data-surface: #1A1A2E;            /* Deep purple-black */
+--data-surface-elevated: #16213E;
+--data-notebook-cell: #0F3460;
+--data-on-surface: #E8E8E8;
+
+/* Code Syntax Highlighting */
+--data-code-bg: #0F1419;
+--data-code-keyword: #FF6AC1;
+--data-code-string: #AAD94C;
+--data-code-number: #D2A6FF;
+--data-code-comment: #5C6773;
+
+/* Network Graph */
+--data-node: #4ECDC4;
+--data-edge: rgba(255, 255, 255, 0.2);
+--data-node-hover: #FF6B6B;
+```
+
+---
+
+#### **Typography**
+
+```css
+/* Font Stack (Scientific/Technical) */
+--font-heading-data: 'Source Sans Pro', 'Inter', system-ui;
+--font-body-data: 'Source Sans Pro', 'Helvetica', sans-serif;
+--font-mono-data: 'Fira Code', 'Monaco', monospace;
+
+/* Type Scale */
+--text-notebook-title: clamp(2rem, 3vw, 2.5rem);
+--text-cell-output: clamp(0.875rem, 1vw, 1rem);
+--text-code: clamp(0.8125rem, 0.95vw, 0.9375rem);
+
+/* Font Features (Code ligatures) */
+font-feature-settings: 'liga' 1, 'calt' 1;
+```
+
+---
+
+#### **Layout: Notebook Cell System**
+
+```css
+.notebook-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.notebook-cell {
+  margin-bottom: 2rem;
+  border-left: 4px solid var(--data-primary);
+  background: var(--data-notebook-cell);
+  border-radius: 0 8px 8px 0;
+  overflow: hidden;
+}
+
+.cell-input {
+  background: var(--data-code-bg);
+  padding: 1rem;
+  font-family: var(--font-mono-data);
+  font-size: 0.9rem;
+  color: var(--data-on-surface);
+}
+
+.cell-output {
+  padding: 1.5rem;
+  background: var(--data-surface-elevated);
+}
+
+.cell-counter {
+  display: inline-block;
+  width: 60px;
+  text-align: center;
+  font-family: var(--font-mono-data);
+  font-size: 0.75rem;
+  color: var(--data-accent);
+  opacity: 0.7;
+}
+```
+
+---
+
+#### **Navigation: Notebook Cells**
+
+```tsx
+// components/adaptive/AdaptiveNav.tsx (Data variant)
+'use client';
+
+import { motion } from 'framer-motion';
+import Link from 'next/link';
+
+const NAV_ITEMS = [
+  { href: '#exploration', label: 'Data Exploration', icon: '📊' },
+  { href: '#visualization', label: 'Visualizations', icon: '📈' },
+  { href: '#models', label: 'Models', icon: '🤖' },
+  { href: '#insights', label: 'Insights', icon: '💡' },
+];
+
+export function DataNavigation() {
+  return (
+    <nav className="fixed top-0 left-0 right-0 z-50 h-16 flex items-center px-8 backdrop-blur-md border-b"
+      style={{
+        backgroundColor: 'rgba(26, 26, 46, 0.9)',
+        borderColor: 'rgba(255, 255, 255, 0.1)',
+      }}
+    >
+      {/* Logo */}
+      <div className="text-2xl font-bold mr-12" style={{ color: 'var(--data-primary)' }}>
+        Data Lab
+      </div>
+
+      {/* Nav Items */}
+      <div className="flex gap-6">
+        {NAV_ITEMS.map((item) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            className="flex items-center gap-2 text-sm font-medium opacity-70 hover:opacity-100 transition-opacity"
+            style={{ color: 'var(--data-on-surface)' }}
+          >
+            <span>{item.icon}</span>
+            <span>{item.label}</span>
+          </Link>
+        ))}
+      </div>
+
+      {/* Run All Button */}
+      <button
+        className="ml-auto px-6 py-2 rounded-lg font-semibold flex items-center gap-2"
+        style={{
+          background: 'linear-gradient(135deg, var(--data-primary) 0%, var(--data-secondary) 100%)',
+          color: 'white',
+        }}
+      >
+        ▶ Run All Cells
+      </button>
+    </nav>
+  );
+}
+```
+
+---
+
+#### **Cursor: Data Point Selector**
+
+```tsx
+// components/adaptive/AdaptiveCursor.tsx (Data variant)
+'use client';
+
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+
+export function DataCursor() {
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [hoveredData, setHoveredData] = useState<{ label: string; value: number } | null>(null);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      setPosition({ x: e.clientX, y: e.clientY });
+
+      // Detect if hovering over data point
+      const element = document.elementFromPoint(e.clientX, e.clientY);
+      const dataPoint = element?.closest('[data-point]');
+
+      if (dataPoint) {
+        const label = dataPoint.getAttribute('data-label') || '';
+        const value = parseFloat(dataPoint.getAttribute('data-value') || '0');
+        setHoveredData({ label, value });
+      } else {
+        setHoveredData(null);
+      }
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
+  return (
+    <>
+      {/* Custom cursor ring */}
+      <motion.div
+        className="fixed w-8 h-8 rounded-full border-2 pointer-events-none z-[9999]"
+        style={{
+          left: position.x - 16,
+          top: position.y - 16,
+          borderColor: 'var(--data-accent)',
+        }}
+        animate={{
+          scale: hoveredData ? 1.5 : 1,
+        }}
+        transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+      />
+
+      {/* Data tooltip */}
+      <AnimatePresence>
+        {hoveredData && (
+          <motion.div
+            className="fixed px-4 py-2 rounded-lg font-mono text-sm pointer-events-none z-[9998]"
+            style={{
+              left: position.x + 20,
+              top: position.y - 40,
+              backgroundColor: 'var(--data-primary)',
+              color: 'white',
+            }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+          >
+            <div className="font-bold">{hoveredData.label}</div>
+            <div className="text-xs opacity-90">{hoveredData.value.toFixed(2)}</div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
+  );
+}
+```
+
+---
+
+#### **Background Pattern: Network Graph**
+
+```tsx
+// components/adaptive/BackgroundPattern.tsx (Data variant)
+'use client';
+
+import { useEffect, useRef } from 'react';
+
+interface Node {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+}
+
+export function DataNetworkPattern() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let animationId: number;
+    const nodes: Node[] = [];
+    const nodeCount = 40;
+    const connectionDistance = 150;
+
+    const resize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+
+    // Initialize nodes
+    for (let i = 0; i < nodeCount; i++) {
+      nodes.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        vx: (Math.random() - 0.5) * 0.5,
+        vy: (Math.random() - 0.5) * 0.5,
+      });
+    }
+
+    const draw = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Update node positions
+      nodes.forEach((node) => {
+        node.x += node.vx;
+        node.y += node.vy;
+
+        // Bounce off edges
+        if (node.x < 0 || node.x > canvas.width) node.vx *= -1;
+        if (node.y < 0 || node.y > canvas.height) node.vy *= -1;
+      });
+
+      // Draw connections
+      ctx.strokeStyle = 'rgba(78, 205, 196, 0.1)';
+      ctx.lineWidth = 1;
+      nodes.forEach((nodeA, i) => {
+        nodes.slice(i + 1).forEach((nodeB) => {
+          const distance = Math.hypot(nodeB.x - nodeA.x, nodeB.y - nodeA.y);
+          if (distance < connectionDistance) {
+            const opacity = 1 - distance / connectionDistance;
+            ctx.globalAlpha = opacity * 0.3;
+            ctx.beginPath();
+            ctx.moveTo(nodeA.x, nodeA.y);
+            ctx.lineTo(nodeB.x, nodeB.y);
+            ctx.stroke();
+          }
+        });
+      });
+      ctx.globalAlpha = 1;
+
+      // Draw nodes
+      nodes.forEach((node) => {
+        ctx.fillStyle = 'rgba(78, 205, 196, 0.6)';
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, 3, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      animationId = requestAnimationFrame(draw);
+    };
+
+    resize();
+    draw();
+    window.addEventListener('resize', resize);
+
+    return () => {
+      window.removeEventListener('resize', resize);
+      cancelAnimationFrame(animationId);
+    };
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="fixed inset-0 -z-10 pointer-events-none"
+      style={{ opacity: 0.4 }}
+    />
+  );
+}
+```
+
+---
+
+#### **Card Style: Notebook Cells**
+
+```tsx
+// components/cards/DataNotebookCell.tsx
+'use client';
+
+import { motion } from 'framer-motion';
+import { useState } from 'react';
+import SyntaxHighlighter from 'react-syntax-highlighter';
+import { atomOneDark } from 'react-syntax-highlighter/dist/esm/styles/hljs';
+
+interface NotebookCellProps {
+  cellNumber: number;
+  code: string;
+  output?: React.ReactNode;
+  executionTime?: number;
+}
+
+export function DataNotebookCell({
+  cellNumber,
+  code,
+  output,
+  executionTime,
+}: NotebookCellProps) {
+  const [isExecuting, setIsExecuting] = useState(false);
+
+  const handleRun = () => {
+    setIsExecuting(true);
+    setTimeout(() => setIsExecuting(false), 1000);
+  };
+
+  return (
+    <motion.div
+      className="notebook-cell mb-6 rounded-r-lg overflow-hidden"
+      style={{
+        borderLeft: `4px solid var(--data-primary)`,
+        backgroundColor: 'var(--data-notebook-cell)',
+      }}
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ delay: cellNumber * 0.1 }}
+    >
+      {/* Cell Header */}
+      <div className="flex items-center justify-between px-4 py-2 border-b" style={{
+        borderColor: 'rgba(255, 255, 255, 0.1)',
+      }}>
+        <div className="flex items-center gap-3">
+          <span className="cell-counter" style={{ color: 'var(--data-accent)' }}>
+            [{cellNumber}]:
+          </span>
+          <span className="text-xs opacity-50" style={{ color: 'var(--data-on-surface)' }}>
+            Python
+          </span>
+        </div>
+
+        <button
+          onClick={handleRun}
+          className="px-4 py-1 rounded text-xs font-semibold"
+          style={{
+            backgroundColor: isExecuting ? 'var(--data-secondary)' : 'rgba(255, 255, 255, 0.1)',
+            color: 'white',
+          }}
+        >
+          {isExecuting ? '⏳ Running...' : '▶ Run'}
+        </button>
+      </div>
+
+      {/* Code Input */}
+      <div className="cell-input" style={{ backgroundColor: 'var(--data-code-bg)' }}>
+        <SyntaxHighlighter
+          language="python"
+          style={atomOneDark}
+          customStyle={{
+            background: 'transparent',
+            padding: 0,
+            margin: 0,
+            fontSize: '0.9rem',
+          }}
+        >
+          {code}
+        </SyntaxHighlighter>
+      </div>
+
+      {/* Cell Output */}
+      {output && (
+        <div className="cell-output" style={{ backgroundColor: 'var(--data-surface-elevated)' }}>
+          {output}
+
+          {executionTime && (
+            <div className="mt-4 text-xs opacity-50 font-mono" style={{ color: 'var(--data-on-surface)' }}>
+              Execution time: {executionTime}ms
+            </div>
+          )}
+        </div>
+      )}
+    </motion.div>
+  );
+}
+```
+
+---
+
+#### **Signature Feature: Interactive CSV Analyzer**
+
+**Concept**: Visitors upload CSV, see instant analysis with charts
+
+```tsx
+// components/domain-specific/DataPlayground.tsx
+'use client';
+
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { DataNotebookCell } from '@/components/cards/DataNotebookCell';
+
+export function DataPlayground() {
+  const [csvData, setCsvData] = useState<any[] | null>(null);
+  const [fileName, setFileName] = useState('');
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setFileName(file.name);
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const text = event.target?.result as string;
+      const rows = text.split('\n').map(row => row.split(','));
+
+      // Simple CSV parsing (headers + data)
+      const headers = rows[0];
+      const data = rows.slice(1).map(row => {
+        return headers.reduce((obj, header, index) => {
+          obj[header] = row[index];
+          return obj;
+        }, {} as any);
+      });
+
+      setCsvData(data);
+    };
+    reader.readAsText(file);
+  };
+
+  return (
+    <div className="max-w-6xl mx-auto p-8">
+      <h1 className="text-5xl font-bold mb-4" style={{ color: 'var(--data-primary)' }}>
+        Interactive Data Playground
+      </h1>
+      <p className="text-lg opacity-70 mb-12" style={{ color: 'var(--data-on-surface)' }}>
+        Upload your CSV and watch the analysis unfold in real-time
+      </p>
+
+      {/* Upload Area */}
+      {!csvData ? (
+        <motion.label
+          className="block w-full p-12 border-2 border-dashed rounded-2xl cursor-pointer text-center"
+          style={{
+            borderColor: 'var(--data-accent)',
+            backgroundColor: 'rgba(69, 183, 209, 0.05)',
+          }}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+        >
+          <div className="text-6xl mb-4">📊</div>
+          <div className="text-xl font-semibold mb-2" style={{ color: 'var(--data-accent)' }}>
+            Drop your CSV file here
+          </div>
+          <div className="text-sm opacity-70" style={{ color: 'var(--data-on-surface)' }}>
+            or click to browse
+          </div>
+          <input
+            type="file"
+            accept=".csv"
+            onChange={handleFileUpload}
+            className="hidden"
+          />
+        </motion.label>
+      ) : (
+        <>
+          {/* Data Analysis Cells */}
+          <DataNotebookCell
+            cellNumber={1}
+            code={`import pandas as pd\n\n# Load dataset\ndf = pd.read_csv('${fileName}')\ndf.head()`}
+            output={
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm font-mono">
+                  <thead>
+                    <tr className="border-b" style={{ borderColor: 'rgba(255, 255, 255, 0.2)' }}>
+                      {Object.keys(csvData[0]).map(key => (
+                        <th key={key} className="text-left p-2" style={{ color: 'var(--data-accent)' }}>
+                          {key}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {csvData.slice(0, 5).map((row, i) => (
+                      <tr key={i} className="border-b" style={{ borderColor: 'rgba(255, 255, 255, 0.1)' }}>
+                        {Object.values(row).map((value: any, j) => (
+                          <td key={j} className="p-2" style={{ color: 'var(--data-on-surface)' }}>
+                            {value}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            }
+            executionTime={42}
+          />
+
+          <DataNotebookCell
+            cellNumber={2}
+            code={`# Dataset overview\nprint(f"Shape: {df.shape}")\nprint(f"Columns: {df.columns.tolist()}")`}
+            output={
+              <div className="font-mono text-sm" style={{ color: 'var(--data-on-surface)' }}>
+                <div>Shape: ({csvData.length}, {Object.keys(csvData[0]).length})</div>
+                <div>Columns: {Object.keys(csvData[0]).join(', ')}</div>
+              </div>
+            }
+            executionTime={18}
+          />
+
+          <DataNotebookCell
+            cellNumber={3}
+            code={`# Statistical summary\ndf.describe()`}
+            output={
+              <div className="text-center py-12" style={{ color: 'var(--data-secondary)' }}>
+                <div className="text-6xl mb-4">📈</div>
+                <div className="text-xl font-semibold">Statistical analysis complete</div>
+                <div className="text-sm opacity-70 mt-2">
+                  Found {csvData.length} rows with {Object.keys(csvData[0]).length} columns
+                </div>
+              </div>
+            }
+            executionTime={156}
+          />
+
+          {/* Reset Button */}
+          <button
+            onClick={() => setCsvData(null)}
+            className="mt-8 px-8 py-3 rounded-lg font-semibold"
+            style={{
+              background: 'linear-gradient(135deg, var(--data-primary) 0%, var(--data-secondary) 100%)',
+              color: 'white',
+            }}
+          >
+            Upload New Dataset
+          </button>
+        </>
+      )}
+    </div>
+  );
+}
+```
+
+---
+
+### 🎨 Domain 5: UI/UX Design - "Figma Playground"
+
+#### **Design Philosophy**
+
+**Inspired by**: Figma, Sketch, Adobe XD, Framer
+
+**Core Principles:**
+1. **Design Tool Aesthetic**: Interface mirrors design software
+2. **Playful Creativity**: Bézier curves, morphing shapes, color swatches
+3. **Component Showcase**: Interactive design system
+4. **Artistic Expression**: Design is art + science
+
+---
+
+#### **Color System**
+
+```css
+/* Vibrant Creative Palette */
+--design-primary: #FF1493;          /* Deep Pink (creativity) */
+--design-primary-rgb: 255, 20, 147;
+
+--design-secondary: #9370DB;        /* Medium Purple (innovation) */
+--design-secondary-rgb: 147, 112, 219;
+
+--design-accent: #FFD700;           /* Gold (excellence) */
+--design-accent-rgb: 255, 215, 0;
+
+/* Gradient Overlays */
+--design-gradient-1: linear-gradient(135deg, #FF1493 0%, #9370DB 100%);
+--design-gradient-2: linear-gradient(135deg, #FFD700 0%, #FF1493 100%);
+--design-gradient-3: linear-gradient(135deg, #9370DB 0%, #00D9FF 100%);
+
+/* Surface Colors */
+--design-surface: #0F0F0F;          /* Pure black */
+--design-surface-elevated: #1C1C1C;
+--design-canvas: #FAFAFA;           /* Light canvas for contrast */
+--design-on-surface: #FFFFFF;
+
+/* Design Tool Colors */
+--design-selection: #0066FF;        /* Figma blue */
+--design-guide: rgba(255, 20, 147, 0.3);
+--design-grid: rgba(0, 0, 0, 0.05);
+
+/* Color Swatches (Palette) */
+--swatch-1: #FF1493;
+--swatch-2: #9370DB;
+--swatch-3: #FFD700;
+--swatch-4: #00D9FF;
+--swatch-5: #4ECDC4;
+--swatch-6: #FF6B6B;
+```
+
+---
+
+#### **Typography**
+
+```css
+/* Font Stack (Designer's Choice) */
+--font-heading-design: 'Playfair Display', Georgia, serif;
+--font-body-design: 'Lato', 'Helvetica Neue', sans-serif;
+--font-mono-design: 'JetBrains Mono', monospace;
+
+/* Type Scale (Expressive) */
+--text-hero-design: clamp(4rem, 10vw, 8rem);    /* Dramatic headlines */
+--text-h1-design: clamp(3rem, 6vw, 5rem);
+--text-h2-design: clamp(2rem, 4vw, 3rem);
+--text-body-design: clamp(1.125rem, 2vw, 1.25rem);
+
+/* Font Weights (Variable) */
+--font-weight-light: 300;
+--font-weight-regular: 400;
+--font-weight-semibold: 600;
+--font-weight-bold: 700;
+--font-weight-black: 900;
+
+/* Letter Spacing (Refined) */
+--letter-spacing-tight: -0.03em;
+--letter-spacing-normal: 0;
+--letter-spacing-wide: 0.1em;       /* Display text */
+```
+
+---
+
+#### **Layout: Canvas + Sidebar**
+
+```css
+.design-workspace {
+  display: grid;
+  grid-template-columns: 80px 280px 1fr 320px; /* Tools | Layers | Canvas | Props */
+  grid-template-rows: 56px 1fr;               /* Top bar | Workspace */
+  height: 100vh;
+  background: var(--design-surface);
+}
+
+.tool-panel {
+  background: var(--design-surface-elevated);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem 0;
+}
+
+.canvas-area {
+  background: var(--design-canvas);
+  position: relative;
+  overflow: hidden;
+}
+
+.properties-panel {
+  background: var(--design-surface-elevated);
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1.5rem;
+  overflow-y: auto;
+}
+```
+
+---
+
+#### **Navigation: Design Tool Sidebar**
+
+```tsx
+// components/adaptive/AdaptiveNav.tsx (Design variant)
+'use client';
+
+import { motion } from 'framer-motion';
+import { useState } from 'react';
+
+const TOOLS = [
+  { icon: '⬜', name: 'Frame', shortcut: 'F' },
+  { icon: '🔵', name: 'Ellipse', shortcut: 'O' },
+  { icon: '📐', name: 'Pen', shortcut: 'P' },
+  { icon: '🖌️', name: 'Brush', shortcut: 'B' },
+  { icon: '✏️', name: 'Text', shortcut: 'T' },
+  { icon: '🎨', name: 'Fill', shortcut: 'I' },
+];
+
+export function DesignNavigation() {
+  const [activeTool, setActiveTool] = useState(0);
+
+  return (
+    <>
+      {/* Top Menu Bar */}
+      <div className="fixed top-0 left-0 right-0 z-50 h-14 flex items-center justify-between px-6 border-b"
+        style={{
+          backgroundColor: 'var(--design-surface-elevated)',
+          borderColor: 'rgba(255, 255, 255, 0.1)',
+        }}
+      >
+        {/* Logo */}
+        <div className="text-xl font-bold" style={{ color: 'var(--design-primary)' }}>
+          PIGO<span style={{ color: 'var(--design-secondary)' }}>.</span>DESIGN
+        </div>
+
+        {/* Center Menu */}
+        <div className="flex gap-6">
+          {['Portfolio', 'Components', 'Process', 'Contact'].map((item) => (
+            <button
+              key={item}
+              className="text-sm font-medium opacity-70 hover:opacity-100 transition-opacity"
+              style={{ color: 'var(--design-on-surface)' }}
+            >
+              {item}
+            </button>
+          ))}
+        </div>
+
+        {/* Share Button */}
+        <button
+          className="px-6 py-2 rounded-full font-semibold"
+          style={{
+            background: 'var(--design-gradient-1)',
+            color: 'white',
+          }}
+        >
+          View Work
+        </button>
+      </div>
+
+      {/* Left Tool Sidebar */}
+      <div className="fixed left-0 top-14 bottom-0 w-20 border-r flex flex-col items-center py-6 gap-4 z-40"
+        style={{
+          backgroundColor: 'var(--design-surface-elevated)',
+          borderColor: 'rgba(255, 255, 255, 0.1)',
+        }}
+      >
+        {TOOLS.map((tool, index) => (
+          <motion.button
+            key={tool.name}
+            onClick={() => setActiveTool(index)}
+            className="w-12 h-12 rounded-lg flex items-center justify-center text-2xl relative"
+            style={{
+              backgroundColor: activeTool === index ? 'var(--design-primary)' : 'transparent',
+            }}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            title={`${tool.name} (${tool.shortcut})`}
+          >
+            {tool.icon}
+
+            {/* Keyboard shortcut */}
+            <span className="absolute -bottom-1 -right-1 text-[8px] font-mono px-1 rounded"
+              style={{
+                backgroundColor: 'var(--design-surface)',
+                color: 'var(--design-accent)',
+              }}
+            >
+              {tool.shortcut}
+            </span>
+          </motion.button>
+        ))}
+      </div>
+    </>
+  );
+}
+```
+
+---
+
+#### **Cursor: Pen Tool Cursor**
+
+```tsx
+// components/adaptive/AdaptiveCursor.tsx (Design variant)
+'use client';
+
+import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+
+export function DesignCursor() {
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [isDrawing, setIsDrawing] = useState(false);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      setPosition({ x: e.clientX, y: e.clientY });
+    };
+
+    const handleMouseDown = () => setIsDrawing(true);
+    const handleMouseUp = () => setIsDrawing(false);
+
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mousedown', handleMouseDown);
+    window.addEventListener('mouseup', handleMouseUp);
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mousedown', handleMouseDown);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, []);
+
+  return (
+    <>
+      {/* Custom pen cursor */}
+      <svg
+        className="fixed top-0 left-0 pointer-events-none z-[9999]"
+        width="32"
+        height="32"
+        style={{
+          transform: `translate(${position.x - 4}px, ${position.y - 28}px)`,
+        }}
+      >
+        {/* Pen nib */}
+        <path
+          d="M8 28 L4 24 L12 0 L16 4 Z"
+          fill={isDrawing ? 'var(--design-primary)' : 'var(--design-accent)'}
+          stroke="white"
+          strokeWidth="1"
+        />
+        {/* Pen tip */}
+        <circle
+          cx="8"
+          cy="28"
+          r="3"
+          fill={isDrawing ? 'var(--design-primary)' : 'var(--design-accent)'}
+          stroke="white"
+          strokeWidth="1"
+        />
+      </svg>
+
+      {/* Drawing trail effect */}
+      {isDrawing && (
+        <motion.div
+          className="fixed w-4 h-4 rounded-full pointer-events-none z-[9998]"
+          style={{
+            left: position.x - 8,
+            top: position.y - 8,
+            backgroundColor: 'var(--design-primary)',
+          }}
+          initial={{ scale: 1, opacity: 0.8 }}
+          animate={{ scale: 0, opacity: 0 }}
+          transition={{ duration: 0.6 }}
+        />
+      )}
+    </>
+  );
+}
+```
+
+---
+
+#### **Background Pattern: Bézier Curves**
+
+```tsx
+// components/adaptive/BackgroundPattern.tsx (Design variant)
+'use client';
+
+import { useEffect, useRef } from 'react';
+
+export function DesignBezierPattern() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let animationId: number;
+    let time = 0;
+
+    const resize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+
+    const draw = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw multiple flowing Bézier curves
+      const curves = 5;
+      for (let i = 0; i < curves; i++) {
+        const offset = (i / curves) * canvas.height;
+        const frequency = 0.002 + i * 0.0005;
+
+        ctx.beginPath();
+        ctx.moveTo(0, offset);
+
+        // Create smooth wave with cubic Bézier
+        for (let x = 0; x < canvas.width; x += 100) {
+          const y = offset + Math.sin(x * frequency + time) * (30 + i * 10);
+          const cp1x = x + 33;
+          const cp1y = y + Math.cos((x + 33) * frequency + time) * 20;
+          const cp2x = x + 66;
+          const cp2y = y + Math.cos((x + 66) * frequency + time) * 20;
+          const endX = x + 100;
+          const endY = offset + Math.sin(endX * frequency + time) * (30 + i * 10);
+
+          ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, endX, endY);
+        }
+
+        // Gradient stroke
+        const gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
+        gradient.addColorStop(0, 'rgba(255, 20, 147, 0.1)');      // Pink
+        gradient.addColorStop(0.5, 'rgba(147, 112, 219, 0.1)');   // Purple
+        gradient.addColorStop(1, 'rgba(255, 215, 0, 0.1)');       // Gold
+
+        ctx.strokeStyle = gradient;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      }
+
+      time += 0.01;
+      animationId = requestAnimationFrame(draw);
+    };
+
+    resize();
+    draw();
+    window.addEventListener('resize', resize);
+
+    return () => {
+      window.removeEventListener('resize', resize);
+      cancelAnimationFrame(animationId);
+    };
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="fixed inset-0 -z-10 pointer-events-none"
+      style={{ opacity: 0.7 }}
+    />
+  );
+}
+```
+
+---
+
+#### **Card Style: Design Component Showcase**
+
+```tsx
+// components/cards/DesignComponentCard.tsx
+'use client';
+
+import { motion } from 'framer-motion';
+import { useState } from 'react';
+
+interface DesignComponentProps {
+  componentName: string;
+  category: 'Button' | 'Card' | 'Input' | 'Modal';
+  variants: number;
+  preview: React.ReactNode;
+}
+
+export function DesignComponentCard({
+  componentName,
+  category,
+  variants,
+  preview,
+}: DesignComponentProps) {
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <motion.article
+      className="relative rounded-2xl overflow-hidden border-2 cursor-pointer"
+      style={{
+        backgroundColor: 'var(--design-surface-elevated)',
+        borderColor: isHovered ? 'var(--design-primary)' : 'rgba(255, 255, 255, 0.1)',
+      }}
+      onHoverStart={() => setIsHovered(true)}
+      onHoverEnd={() => setIsHovered(false)}
+      whileHover={{ y: -8 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+    >
+      {/* Preview Area (Canvas) */}
+      <div className="relative h-64 flex items-center justify-center p-8"
+        style={{
+          background: isHovered
+            ? 'var(--design-gradient-1)'
+            : 'linear-gradient(135deg, #1C1C1C 0%, #0F0F0F 100%)',
+        }}
+      >
+        <motion.div
+          animate={{
+            scale: isHovered ? 1.1 : 1,
+            rotate: isHovered ? 2 : 0,
+          }}
+          transition={{ type: 'spring', stiffness: 300 }}
+        >
+          {preview}
+        </motion.div>
+
+        {/* Figma-style selection */}
+        {isHovered && (
+          <motion.div
+            className="absolute inset-4 border-2 rounded-lg pointer-events-none"
+            style={{ borderColor: 'var(--design-selection)' }}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+          >
+            {/* Corner handles */}
+            {['-top-1 -left-1', '-top-1 -right-1', '-bottom-1 -left-1', '-bottom-1 -right-1'].map((pos, i) => (
+              <div
+                key={i}
+                className={`absolute ${pos} w-3 h-3 rounded-full`}
+                style={{ backgroundColor: 'var(--design-selection)' }}
+              />
+            ))}
+          </motion.div>
+        )}
+      </div>
+
+      {/* Component Info */}
+      <div className="p-6">
+        <div className="flex items-start justify-between mb-3">
+          <div>
+            <h3 className="text-xl font-bold mb-1" style={{ color: 'var(--design-on-surface)' }}>
+              {componentName}
+            </h3>
+            <span className="text-xs font-semibold px-2 py-1 rounded-full"
+              style={{
+                backgroundColor: 'rgba(255, 20, 147, 0.2)',
+                color: 'var(--design-primary)',
+              }}
+            >
+              {category}
+            </span>
+          </div>
+
+          <div className="text-right">
+            <div className="text-xs opacity-50" style={{ color: 'var(--design-on-surface)' }}>
+              Variants
+            </div>
+            <div className="text-2xl font-bold" style={{ color: 'var(--design-accent)' }}>
+              {variants}
+            </div>
+          </div>
+        </div>
+
+        {/* Color Swatches */}
+        <div className="flex gap-2 mt-4">
+          {['#FF1493', '#9370DB', '#FFD700', '#00D9FF'].map((color, i) => (
+            <motion.div
+              key={color}
+              className="w-8 h-8 rounded-lg border-2 border-white/20"
+              style={{ backgroundColor: color }}
+              whileHover={{ scale: 1.2 }}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Hover overlay gradient */}
+      <motion.div
+        className="absolute inset-0 pointer-events-none"
+        style={{ background: 'var(--design-gradient-1)', opacity: 0 }}
+        animate={{ opacity: isHovered ? 0.05 : 0 }}
+      />
+    </motion.article>
+  );
+}
+```
+
+---
+
+#### **Signature Feature: Interactive Component Library**
+
+**Concept**: Visitors can customize components in real-time (colors, sizes, variants)
+
+```tsx
+// components/domain-specific/DesignSystemPlayground.tsx
+'use client';
+
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+
+type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost';
+type ButtonSize = 'sm' | 'md' | 'lg';
+
+export function DesignSystemPlayground() {
+  const [variant, setVariant] = useState<ButtonVariant>('primary');
+  const [size, setSize] = useState<ButtonSize>('md');
+  const [primaryColor, setPrimaryColor] = useState('#FF1493');
+  const [borderRadius, setBorderRadius] = useState(8);
+
+  const buttonStyles = {
+    primary: {
+      background: primaryColor,
+      color: 'white',
+      border: 'none',
+    },
+    secondary: {
+      background: '#9370DB',
+      color: 'white',
+      border: 'none',
+    },
+    outline: {
+      background: 'transparent',
+      color: primaryColor,
+      border: `2px solid ${primaryColor}`,
+    },
+    ghost: {
+      background: 'transparent',
+      color: primaryColor,
+      border: 'none',
+    },
+  };
+
+  const sizeStyles = {
+    sm: { padding: '0.5rem 1rem', fontSize: '0.875rem' },
+    md: { padding: '0.75rem 1.5rem', fontSize: '1rem' },
+    lg: { padding: '1rem 2rem', fontSize: '1.125rem' },
+  };
+
+  return (
+    <div className="max-w-7xl mx-auto p-12">
+      <h1 className="text-6xl font-black mb-4" style={{
+        background: 'var(--design-gradient-1)',
+        backgroundClip: 'text',
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+      }}>
+        Design System Lab
+      </h1>
+      <p className="text-xl opacity-70 mb-16" style={{ color: 'var(--design-on-surface)' }}>
+        Customize components in real-time and see the magic happen
+      </p>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        {/* Preview Canvas */}
+        <div className="rounded-2xl p-12 flex items-center justify-center min-h-[400px]"
+          style={{
+            background: 'repeating-linear-gradient(45deg, #1C1C1C 0px, #1C1C1C 10px, #0F0F0F 10px, #0F0F0F 20px)',
+          }}
+        >
+          <motion.button
+            className="font-semibold cursor-pointer"
+            style={{
+              ...buttonStyles[variant],
+              ...sizeStyles[size],
+              borderRadius: `${borderRadius}px`,
+            }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            key={`${variant}-${size}-${primaryColor}-${borderRadius}`}
+          >
+            Click Me
+          </motion.button>
+        </div>
+
+        {/* Controls Panel */}
+        <div className="space-y-8">
+          {/* Variant Selector */}
+          <div>
+            <label className="block text-sm font-semibold mb-3" style={{ color: 'var(--design-on-surface)' }}>
+              Variant
+            </label>
+            <div className="grid grid-cols-4 gap-2">
+              {(['primary', 'secondary', 'outline', 'ghost'] as ButtonVariant[]).map((v) => (
+                <button
+                  key={v}
+                  onClick={() => setVariant(v)}
+                  className="px-4 py-2 rounded-lg font-medium capitalize"
+                  style={{
+                    backgroundColor: variant === v ? 'var(--design-primary)' : 'rgba(255, 255, 255, 0.1)',
+                    color: 'white',
+                  }}
+                >
+                  {v}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Size Selector */}
+          <div>
+            <label className="block text-sm font-semibold mb-3" style={{ color: 'var(--design-on-surface)' }}>
+              Size
+            </label>
+            <div className="grid grid-cols-3 gap-2">
+              {(['sm', 'md', 'lg'] as ButtonSize[]).map((s) => (
+                <button
+                  key={s}
+                  onClick={() => setSize(s)}
+                  className="px-4 py-2 rounded-lg font-medium uppercase text-xs"
+                  style={{
+                    backgroundColor: size === s ? 'var(--design-secondary)' : 'rgba(255, 255, 255, 0.1)',
+                    color: 'white',
+                  }}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Color Picker */}
+          <div>
+            <label className="block text-sm font-semibold mb-3" style={{ color: 'var(--design-on-surface)' }}>
+              Primary Color
+            </label>
+            <div className="flex items-center gap-4">
+              <input
+                type="color"
+                value={primaryColor}
+                onChange={(e) => setPrimaryColor(e.target.value)}
+                className="w-16 h-16 rounded-lg cursor-pointer"
+              />
+              <input
+                type="text"
+                value={primaryColor}
+                onChange={(e) => setPrimaryColor(e.target.value)}
+                className="flex-1 px-4 py-3 rounded-lg font-mono"
+                style={{
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  color: 'var(--design-on-surface)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Border Radius Slider */}
+          <div>
+            <label className="block text-sm font-semibold mb-3" style={{ color: 'var(--design-on-surface)' }}>
+              Border Radius: {borderRadius}px
+            </label>
+            <input
+              type="range"
+              min="0"
+              max="50"
+              value={borderRadius}
+              onChange={(e) => setBorderRadius(parseInt(e.target.value))}
+              className="w-full"
+            />
+          </div>
+
+          {/* Export Code */}
+          <div>
+            <label className="block text-sm font-semibold mb-3" style={{ color: 'var(--design-on-surface)' }}>
+              Generated CSS
+            </label>
+            <pre className="p-4 rounded-lg font-mono text-xs overflow-x-auto"
+              style={{
+                backgroundColor: 'var(--design-surface)',
+                color: 'var(--design-accent)',
+              }}
+            >
+{`.button {
+  background: ${buttonStyles[variant].background};
+  color: ${buttonStyles[variant].color};
+  border: ${buttonStyles[variant].border || 'none'};
+  padding: ${sizeStyles[size].padding};
+  font-size: ${sizeStyles[size].fontSize};
+  border-radius: ${borderRadius}px;
+}`}
+            </pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+---
+
+## 🎯 Summary: 5 Domain Masterpieces Complete
+
+You now have **complete, production-ready specifications** for all 5 domains:
+
+| Domain | Theme | Signature Feature | Color Psychology |
+|--------|-------|-------------------|------------------|
+| 🟢 **Android** | Material Depth | 3D Assembling Robot | Green = Android brand, trust |
+| 🔵 **Web** | Neo-Brutalist Glass | Live Code Editor | Cyan/Purple = modern, creative |
+| 🟡 **Forex** | Financial Terminal | Trading Calculator | Gold = wealth, Teal/Red = bull/bear |
+| 🟢 **Data Analysis** | Interactive Notebook | CSV Analyzer Playground | Multi-color = data categories |
+| 🎨 **Design** | Figma Playground | Component Library | Pink/Purple/Gold = creativity |
+
+Each domain features:
+- ✅ Complete color system with psychology
+- ✅ Custom typography scales
+- ✅ Unique navigation patterns
+- ✅ Domain-specific cursors
+- ✅ Animated background patterns
+- ✅ Custom card components
+- ✅ One signature interactive feature
+
+**Next Steps**: Would you like me to add the remaining blueprint chapters (Signature Features, UX Psychology, MENA Optimization, 8-Week Roadmap)?
 
