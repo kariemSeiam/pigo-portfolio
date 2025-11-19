@@ -1,31 +1,50 @@
+/**
+ * Design Domain Theme
+ * Figma Playground Aesthetic
+ * 
+ * @see CLAUDE.md - Section 6.6 for complete documentation
+ */
+
 import { Theme } from './index'
 
 export const designTheme: Theme = {
   id: 'design',
   name: 'UI/UX Design',
   colors: {
-    primary: '#FF1493',      // Deep pink (creative)
-    secondary: '#9370DB',    // Medium purple (artistic)
-    accent: '#FFD700',       // Gold (premium)
-    surface: '#0A0A0A',      // Figma dark canvas
-    onSurface: '#FFFFFF',    // Pure white text
-    error: '#FF4081',        // Pink error
+    primary: '#FF1493',      // Deep Pink
+    secondary: '#9370DB',    // Medium Purple
+    accent: '#FFD700',       // Gold
+    surface: '#0A0A0A',      // Dark canvas
+    onSurface: '#FFFFFF',    // White
+    error: '#FF6B9D',
+    success: '#C400FF',
+    warning: '#FFB400',
   },
   fonts: {
-    heading: 'SF Pro Display, Helvetica Neue, sans-serif',
-    body: 'SF Pro Text, system-ui, sans-serif',
-    code: 'SF Mono, JetBrains Mono, monospace',
+    heading: 'var(--font-inter)',
+    body: 'var(--font-inter)',
+    code: 'var(--font-jetbrains-mono)',
   },
   animations: {
-    transition: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',  // Figma easing
-    duration: 450,
+    transition: 'cubic-bezier(0.34, 1.56, 0.64, 1)',  // Back easing
+    duration: 350,
+    staggerDelay: 60,
   },
   patterns: {
-    background: 'bezier-curves',  // Bézier curve animations
-    cursorStyle: 'crosshair',     // Design crosshair
+    background: 'bezier',
+    cursorStyle: 'pen',
   },
   layout: {
-    navigation: 'sticky-header',  // Figma-style top bar
-    cardStyle: 'glassmorphism',   // Frosted glass cards
+    navigation: 'sidebar',
+    cardStyle: 'component',
+  },
+  custom: {
+    canvas: {
+      gridSize: '20px',
+      showGrid: true,
+    },
+    component: {
+      componentStroke: 'rgba(255, 20, 147, 0.3)',
+    },
   },
 }

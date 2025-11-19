@@ -1,39 +1,44 @@
+/**
+ * Careers Layout - Theme-Aware
+ * 
+ * This layout manages theme application for all career domain pages.
+ * It subscribes to pathname changes and applies the appropriate theme.
+ * 
+ * Route Mapping:
+ * - /android → androidTheme
+ * - /web → webTheme
+ * - /forex → forexTheme
+ * - /data → dataTheme
+ * - /design → designTheme
+ * 
+ * @see CLAUDE.md - Section 8.3 for complete documentation
+ */
+
 'use client'
 
-import { ReactNode } from 'react'
-import { usePathname } from 'next/navigation'
-import ThemeProvider from '@/components/adaptive/ThemeProvider'
-import AdaptiveNav from '@/components/adaptive/AdaptiveNav'
-import AdaptiveCursor from '@/components/adaptive/AdaptiveCursor'
-import BackgroundPattern from '@/components/adaptive/BackgroundPattern'
+import { useEffect } from 'react'
+import { useThemeStore } from '@/lib/store/theme'
 import { useCareerTheme } from '@/lib/hooks/useCareerTheme'
+import { ThemeProvider } from '@/components/adaptive/ThemeProvider'
 
 export default function CareersLayout({
   children,
 }: {
-  children: ReactNode
+  children: React.ReactNode
 }) {
   const theme = useCareerTheme()
-  const pathname = usePathname()
+  const setTheme = useThemeStore((state) => state.setTheme)
 
-  const getBackgroundPattern = () => {
-    if (pathname.startsWith('/android')) return 'hexagon'
-    if (pathname.startsWith('/web')) return 'grid'
-    if (pathname.startsWith('/forex')) return 'candlesticks'
-    if (pathname.startsWith('/data')) return 'network'
-    if (pathname.startsWith('/design')) return 'bezier'
-    return 'particles'
-  }
+  useEffect(() => {
+    console.log(`[CareersLayout] Applying theme: ${theme.id}`)
+    setTheme(theme)
+  }, [theme, setTheme])
 
   return (
-    <ThemeProvider theme={theme}>
-      <AdaptiveCursor />
-      <BackgroundPattern pattern={getBackgroundPattern()} />
-      <AdaptiveNav />
-      <div className="careers-content min-h-screen">
+    <ThemeProvider>
+      <div className="min-h-screen bg-[rgb(var(--surface))] text-[rgb(var(--on-surface))]">
         {children}
       </div>
     </ThemeProvider>
   )
 }
-

@@ -1,31 +1,49 @@
+/**
+ * Forex Domain Theme
+ * Financial Terminal Aesthetic
+ * 
+ * @see CLAUDE.md - Section 6.4 for complete documentation
+ */
+
 import { Theme } from './index'
 
 export const forexTheme: Theme = {
   id: 'forex',
   name: 'Forex Trading',
   colors: {
-    primary: '#FFD700',      // Gold (wealth, premium)
-    secondary: '#26A69A',    // Teal (bullish signals)
-    accent: '#EF5350',       // Red (bearish signals)
-    surface: '#0D0D0D',      // Terminal black
-    onSurface: '#00FF41',    // Matrix green text
-    error: '#FF5252',        // Critical error red
+    primary: '#FFD700',      // Gold
+    secondary: '#26A69A',    // Teal (buy)
+    accent: '#EF5350',       // Red (sell)
+    surface: '#0A0A0A',      // Black terminal background
+    onSurface: '#FFFFFF',    // White terminal text
+    error: '#EF5350',        // Red for losses
+    success: '#26A69A',      // Green for gains
+    warning: '#FFD700',      // Gold for warnings
   },
   fonts: {
-    heading: 'JetBrains Mono, Courier New, monospace',
-    body: 'JetBrains Mono, monospace',
-    code: 'JetBrains Mono, monospace',
+    heading: 'var(--font-jetbrains-mono)',    // Monospace for terminal feel
+    body: 'var(--font-jetbrains-mono)',
+    code: 'var(--font-jetbrains-mono)',
   },
   animations: {
-    transition: 'linear',    // Sharp terminal transitions
+    transition: 'linear',
     duration: 200,
+    staggerDelay: 30,
   },
   patterns: {
-    background: 'candlesticks',  // Candlestick chart pattern
-    cursorStyle: 'terminal',     // Terminal cursor with blink
+    background: 'candlesticks',
+    cursorStyle: 'selector',
   },
   layout: {
-    navigation: 'sticky-header', // Fixed terminal header
-    cardStyle: 'terminal',       // Terminal window cards
+    navigation: 'ticker',
+    cardStyle: 'terminal',
+  },
+  custom: {
+    terminal: {
+      textShadow: '0 0 5px currentColor',
+      fontFamily: 'Courier New, monospace',
+    },
+    bull: '#26A69A',
+    bear: '#EF5350',
   },
 }

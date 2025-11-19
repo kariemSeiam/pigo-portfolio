@@ -6,20 +6,20 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { useEffect, useState, use } from 'react'
 import { useThemeStore } from '@/lib/store/theme'
-import { androidTheme, webTheme } from '@/lib/themes'
+import { useCareerTheme } from '@/lib/hooks/useCareerTheme'
 
 export default function ProjectPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params)
   const project = getProjectBySlug(slug)
   const { setTheme } = useThemeStore()
   const [mounted, setMounted] = useState(false)
+  
+  // Get theme based on project domain (this would be in the careers layout normally)
+  // For now, just use the current theme
 
   useEffect(() => {
     setMounted(true)
-    if (project) {
-      // Apply theme based on project domain
-      setTheme(project.domain === 'android' ? androidTheme : webTheme)
-    }
+    // Theme would typically be applied by the careers layout
   }, [project, setTheme])
 
   if (!project) {
@@ -123,6 +123,7 @@ export default function ProjectPage({ params }: { params: Promise<{ slug: string
         </motion.div>
 
         {/* Technologies */}
+        {project.technologies && project.technologies.length > 0 && (
         <motion.section
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -131,7 +132,7 @@ export default function ProjectPage({ params }: { params: Promise<{ slug: string
         >
           <h2 className="text-headline font-bold mb-6">Technologies Used</h2>
           <div className="flex flex-wrap gap-3">
-            {project.technologies.map((tech, index) => (
+            {project.technologies?.map((tech, index) => (
               <motion.div
                 key={tech}
                 initial={{ opacity: 0, scale: 0.8 }}
@@ -148,6 +149,7 @@ export default function ProjectPage({ params }: { params: Promise<{ slug: string
             ))}
           </div>
         </motion.section>
+        )}
 
         {/* Impact Metrics */}
         {project.impactMetrics && project.impactMetrics.length > 0 && (

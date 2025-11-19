@@ -1,31 +1,47 @@
+/**
+ * Data Analysis Domain Theme
+ * Jupyter Notebook Aesthetic
+ * 
+ * @see CLAUDE.md - Section 6.5 for complete documentation
+ */
+
 import { Theme } from './index'
 
 export const dataTheme: Theme = {
   id: 'data',
   name: 'Data Analysis',
   colors: {
-    primary: '#FF6B6B',      // Warm red (data viz)
-    secondary: '#4ECDC4',    // Teal (charts)
-    accent: '#45B7D1',       // Sky blue (insights)
-    surface: '#0F0F0F',      // Notebook dark
-    onSurface: '#E8E8E8',    // Light gray text
-    error: '#FF4757',        // Error red
+    primary: '#FF6B6B',      // Warm Red
+    secondary: '#4ECDC4',    // Teal
+    accent: '#45B7D1',       // Sky Blue
+    surface: '#1E1E1E',      // Notebook background
+    onSurface: '#E0E0E0',    // Light text
+    error: '#FF6B6B',
+    success: '#51CF66',
+    warning: '#FFD93D',
   },
   fonts: {
-    heading: 'Inter, system-ui, sans-serif',
-    body: 'Inter, sans-serif',
-    code: 'JetBrains Mono, Consolas, monospace',
+    heading: 'var(--font-inter)',
+    body: 'var(--font-inter)',
+    code: 'var(--font-jetbrains-mono)',
   },
   animations: {
-    transition: 'cubic-bezier(0.4, 0, 0.2, 1)',  // Material easing
-    duration: 350,
+    transition: 'cubic-bezier(0.4, 0, 0.2, 1)',
+    duration: 300,
+    staggerDelay: 50,
   },
   patterns: {
-    background: 'network-graph',  // Network graph visualization
-    cursorStyle: 'pointer',       // Data point pointer
+    background: 'network',
+    cursorStyle: 'pointer',
   },
   layout: {
-    navigation: 'sticky-header',  // Jupyter-style header
-    cardStyle: 'notebook',        // Notebook cell cards
+    navigation: 'cells',
+    cardStyle: 'notebook',
+  },
+  custom: {
+    notebook: {
+      cellBackground: '#2d2d2d',
+      cellBorder: '1px solid #444',
+    },
   },
 }

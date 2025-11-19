@@ -1,63 +1,68 @@
+/**
+ * ThemeProvider - Injects CSS variables and manages theme state
+ * 
+ * Responsibilities:
+ * 1. Subscribe to theme store changes
+ * 2. Convert theme colors to CSS variables
+ * 3. Inject variables into document root
+ * 4. Provide AnimatePresence context for transitions
+ * 5. Log theme changes for debugging
+ * 
+ * CSS Variables Injected:
+ * - --primary, --secondary, --accent (RGB values)
+ * - --surface, --on-surface (RGB values)
+ * - --font-heading, --font-body, --font-code
+ * - --transition, --duration
+ * 
+ * Usage in components:
+ * ```tsx
+ * <div className="bg-[rgb(var(--primary))]">
+ * <div style={{ color: `rgb(var(--accent))` }}>
+ * ```
+ * 
+ * @see CLAUDE.md - Section 8.1 for complete documentation
+ */
+
 'use client'
 
-import { ReactNode, useEffect } from 'react'
+import { useEffect } from 'react'
+import { AnimatePresence } from 'framer-motion'
 import { useThemeStore } from '@/lib/store/theme'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Theme, hexToRgb } from '@/lib/themes'
+import { getThemeCSSVariables } from '@/lib/themes'
 
 interface ThemeProviderProps {
-  children: ReactNode
-  theme?: Theme
+  children: React.ReactNode
 }
 
-export default function ThemeProvider({ children, theme }: ThemeProviderProps) {
-  const { currentTheme, setTheme, isTransitioning } = useThemeStore()
+export function ThemeProvider({ children }: ThemeProviderProps) {
+  const currentTheme = useThemeStore((state) => state.currentTheme)
 
   useEffect(() => {
-    if (theme && theme.id !== currentTheme.id) {
-      setTheme(theme)
-      applyThemeToDom(theme)
-    }
-  }, [theme, currentTheme.id, setTheme])
-
-  const applyThemeToDom = (activeTheme: Theme) => {
+    // Get CSS variables from theme
+    const cssVars = getThemeCSSVariables(currentTheme)
+    
+    // Get document root
     const root = document.documentElement
 
-    // Apply color CSS variables (RGB format for Tailwind)
-    root.style.setProperty('--theme-primary', hexToRgb(activeTheme.colors.primary))
-    root.style.setProperty('--theme-secondary', hexToRgb(activeTheme.colors.secondary))
-    root.style.setProperty('--theme-accent', hexToRgb(activeTheme.colors.accent))
-    root.style.setProperty('--theme-surface', hexToRgb(activeTheme.colors.surface))
-    root.style.setProperty('--theme-on-surface', hexToRgb(activeTheme.colors.onSurface))
+    // Inject all CSS variables
+    Object.entries(cssVars).forEach(([key, value]) => {
+      root.style.setProperty(key, value)
+    })
 
-    // Apply font variables
-    root.style.setProperty('--font-heading', activeTheme.fonts.heading)
-    root.style.setProperty('--font-body', activeTheme.fonts.body)
-    root.style.setProperty('--font-code', activeTheme.fonts.code)
+    // Add theme ID as data attribute for CSS selectors
+    root.setAttribute('data-theme', currentTheme.id)
 
-    // Apply animation duration (milliseconds)
-    root.style.setProperty('--transition-duration', `${activeTheme.animations.duration}ms`)
+    // Log theme application
+    console.log(`[ThemeProvider] Applied theme: ${currentTheme.name} (${currentTheme.id})`)
+    console.log('[ThemeProvider] CSS Variables:', cssVars)
 
-    // Data attributes for CSS selectors
-    root.setAttribute('data-theme', activeTheme.id)
-    root.setAttribute('data-cursor-style', activeTheme.patterns.cursorStyle)
-    root.setAttribute('data-background-pattern', activeTheme.patterns.background)
-    root.setAttribute('data-navigation-style', activeTheme.layout.navigation)
-  }
+    // Optional: Trigger theme change event for other components
+    window.dispatchEvent(new CustomEvent('themechange', { detail: currentTheme }))
+  }, [currentTheme])
 
   return (
     <AnimatePresence mode="wait">
-      <motion.div
-        key={currentTheme.id}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.3 }}
-        className="min-h-screen"
-      >
-        {children}
-      </motion.div>
+      {children}
     </AnimatePresence>
   )
 }
-
